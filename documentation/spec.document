@@ -1,0 +1,71 @@
+< Document: A meta format for simple documents
+
+The purpose of this format is to ease the creation, storage and
+publishing of documents. Documents contain a hierarchy of sections
+which in return contain formatted text and media in form of
+paragraphs, lists, tables, code and links. The goals are achieved by
+specifying a human consumable but basic plain text format for in- and
+output and implementing an internal tree-based format in common lisp.
+
+ < Contents of a document
+
+ Paragraphs are text bodies which contain formatting like *bold*,
+ _italic_ and {code} but also links like this one:
+ [http://triakis.ath.cx/].
+
+ + a list
+ + _an_ item
+ + *yet* another {one}
+
+ #media A short description of the picture.#
+ picture.png
+
+ #table A short description of the table.#
+ | name | age | rating
+ | Jim  | 33  | A
+ | Joe  | 27  | B
+ | ...  | ... | ...
+
+ #code A short description of the code.#
+ (defun pow (x n)
+   "Returns power N of X."
+   (if (= n 1)
+       x
+       (* x (pow x (- n 1)))))
+ #
+
+ Special interpretation of characters like \<, \>, \+, \|, \_, \{, \[, \#
+ and \\ can be prevented by quoting them with \\.
+
+ >
+
+ < Lisp representation
+
+ Documents in their lisp representation consist of a list hierarchy
+ made up of strings and symbols.
+
+ #table Formal definition of a document.#
+ | Element   | Definition
+ | document  | (\[paragraph\|list\|table\|media\|pre\|section...\])
+ | paragraph | (:p \<text\>)
+ | list      | (:l (\<text...\>))
+ | table     | (:t \<text\> ((\<textbody...\>))...)
+ | media     | (:m \<text\> string)
+ | pre	     | (:r \<text\> string)
+ | section   | (:s \<text\> \[document...\])
+ | text      | (\[string\|bold\|italic\|code\|url...\])
+ | string    | a vector of characters
+ | bold	     | (:b string)
+ | italic    | (:i string)
+ | code	     | (:c string)
+
+ #code A sample document as an s-expression.#
+ ((:s ("string")
+      (:p ("A " (:c "paragraph")))
+      (:l (((:b "bold"))
+           ((:i "italic"))))))
+ #
+
+ >
+
+>
