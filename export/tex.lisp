@@ -1,12 +1,14 @@
 ;;;; Export document to TeX manuscript.
 
 ;;;; Requires these macros:
-;;;; \bold{#1} \italic{#1} \code{#1} \url{#1}
-;;;; \listing{#1} \listingitem{#1}
-;;;; \table{#1}{#2} \head{#1} \row{#1} \column{#1}
-;;;; \graphicfigure{#1}{#2}
-;;;; \textfigure{#1}{#2}
-;;;; \section{#1} \subsection{#1} \subsubsection{#1}
+;;;; \dbold{#1} \ditalic{#1} \dcode{#1} \durl{#1}
+;;;; \dlisting{#1} \ditem{#1}
+;;;; \dtable{#1}{#2} \dhead{#1} \drow{#1} \dcolumn{#1}
+;;;; \dgraphic{#1}{#2}
+;;;; \dverbatimstart
+;;;; \dverbatimend
+;;;; \dverbatimdescription{#1}
+;;;; \dsection{#1} \dsubsection{#1} \dsubsubsection{#1}
 
 (defpackage document.export.tex
   (:documentation
@@ -29,10 +31,10 @@
   "Print TeX macro call for marked up TEXT-PART."
   (let ((text-part-string (escape (content-values text-part))))
     (case (content-type text-part)
-      (#.+bold+   (tex (bold   {($ text-part-string)})))
-      (#.+italic+ (tex (italic {($ text-part-string)})))
-      (#.+code+   (tex (code   {($ text-part-string)})))
-      (#.+url+    (tex (url    {($ text-part-string)})))
+      (#.+bold+   (tex (dbold   {($ text-part-string)})))
+      (#.+italic+ (tex (ditalic {($ text-part-string)})))
+      (#.+code+   (tex (dcode   {($ text-part-string)})))
+      (#.+url+    (tex (durl    {($ text-part-string)})))
       (otherwise  (error "TEXT-PART has invalid content-type: ~S."
 			 (content-type text-part))))))
 
@@ -51,49 +53,58 @@
 
 (defun print-listing (listing)
   "Print LISTING in TeX representation."
-  (tex (listing
+  (tex (dlisting
 	{($ (dolist (item (content-values listing))
-	      (tex (listingitem {($ (print-text item))}))))})
+	      (tex (ditem {($ (print-text item))}))))})
        (br)))
 
 (defun print-table-row (row)
   "Print ROW in TeX representation."
   (dolist (column row)
-    (tex (column {($ (print-text column))}))))
+    (tex (dcolumn {($ (print-text column))}))))
+
+(defun print-table-headrow (headrow)
+  "Print HEADROW in TeX representation."
+  (dolist (column headrow)
+    (tex (dhead {($ (print-text column))}))))
 
 (defun print-table (table)
   "Print TABLE in TeX representation."
   (multiple-value-bind (description rows)
       (content-values table)
-    (tex (table
+    (tex (dtable
 	  {($ (print-text description))}
-	  {(head {($ (print-table-row (first rows)))})
-	  ($ (dolist (row (rest rows))
-	       (tex (row {($ (print-table-row row))}))))})
+	  {(drow {($ (print-table-headrow (first rows)))})
+	   ($ (dolist (row (rest rows))
+		(tex (drow {($ (print-table-row row))}))))})
 	 (br))))
 
 (defun print-media (media-object)
   "Print MEDIA in TeX representation (can only be 2D graphics)."
   (multiple-value-bind (description url)
       (content-values media-object)
-    (tex (graphicfigure {($ (print-text description))}
-			{($ (escape url))})
+    (tex (dgraphic {($ (print-text description))}
+		   {($ (escape url))})
 	 (br))))
 
 (defun print-code (code-object)
-  "Print MEDIA in TeX representation (can only be 2D graphics)."
+  "Print CODE-OBJECT in TeX representation."
   (multiple-value-bind (description text)
       (content-values code-object)
-    (tex (textfigure {($ (print-text description))}
-		     {($ (escape text))})
+    (tex (dverbatimstart)
+	 ($ (fresh-line))
+	 ($ text)
+	 ($ (fresh-line))
+	 (dverbatimend)
+	 (dverbatimdescription {($ (print-text description))})
 	 (br))))
 
 (defun print-header (header)
   "Print HEADER in TeX representation."
   (case *section-level*
-    (0 (tex (section {($ (print-text header))})))
-    (1 (tex (subsection {($ (print-text header))})))
-    (otherwise (tex (subsubsection {($ (print-text header))}))))
+    (0 (tex (dsection {($ (print-text header))})))
+    (1 (tex (dsubsection {($ (print-text header))})))
+    (otherwise (tex (dsubsubsection {($ (print-text header))}))))
   (tex (br)))
 
 (defun print-section (section)
