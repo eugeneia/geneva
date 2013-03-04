@@ -125,9 +125,7 @@
 	     (4 (h4 (print-headline headline level)))
 	     (5 (h5 (print-headline headline level)))
 	     (t (h6 (print-headline headline level))))))
-    (if *print-indexed-p*
-	(header [:id (make-section-id-string level)] (print-h))
-        (header (print-h)))))
+    (header (a [:name (make-section-id-string level)] (print-h)))))
 
 (defun null-level ()
   "Returns the root level."
