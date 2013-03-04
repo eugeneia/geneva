@@ -7,4 +7,4 @@
 
 (defsystem document-import-plain
   :components ((:file "import/plain"))
-  :depends-on ("document" "smug" "defmacro!"))
+  :depends-on ("document" "smug"))

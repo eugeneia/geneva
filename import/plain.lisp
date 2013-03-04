@@ -2,10 +2,9 @@
 
 (defpackage document.import.plain
   (:use :cl
-	:defmacro!
         :document
-	:smug
-	:smug.characters)
+        :smug
+        :smug.characters)
   (:import-from :alexandria :flatten)
   (:export :import-document-plain))
 
@@ -89,30 +88,35 @@
 (define-condition malformed-section (unexpected-token) ()
   (:documentation "Malformed section error."))
 
-(defmacro! syntax-error (type &rest initargs)
-  `(=fail
-    (multiple-value-bind (,g!position ,g!line ,g!character)
+(defmacro syntax-error (type &rest initargs)
+  (let ((g!position (gensym "position"))
+	(g!line (gensym "line"))
+	(g!character (gensym "character")))
+    `(=fail
+      (multiple-value-bind (,g!position ,g!line ,g!character)
 	(get-input-position)
       (declare (ignore ,g!position))
       (error ,type
 	     :line ,g!line
 	     :character ,g!character
-	     ,@initargs))))
+	     ,@initargs)))))
 
-(defmacro! pass-syntax-error (o!syntax-error)
-  `(=fail
-    (multiple-value-bind (position line character)
-	(get-input-position)
-      (declare (ignore position))
-      (let ((child-line (line-position ,g!syntax-error))
-	    (child-character (character-position ,g!syntax-error)))
-	(setf (line-position ,g!syntax-error)
-	      (+ (1- line) child-line))
-	(setf (character-position ,g!syntax-error)
-	      (if (= line child-line)
-		  (+ (1- character) child-character)
-		  child-character)))
-      (error ,g!syntax-error))))
+(defmacro pass-syntax-error (syntax-error)
+  (let ((g!syntax-error (gensym "sytax-error")))
+    `(let ((,g!syntax-error ,syntax-error))
+       (=fail
+	(multiple-value-bind (position line character)
+	  (get-input-position)
+	  (declare (ignore position))
+	  (let ((child-line (line-position ,g!syntax-error))
+		(child-character (character-position ,g!syntax-error)))
+	    (setf (line-position ,g!syntax-error)
+		  (+ (1- line) child-line))
+	    (setf (character-position ,g!syntax-error)
+		  (if (= line child-line)
+		      (+ (1- character) child-character)
+		      child-character)))
+	  (error ,g!syntax-error))))))
 
 
 ;;; Generic parsers
