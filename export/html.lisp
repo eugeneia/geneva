@@ -57,7 +57,8 @@
 
 (defun print-object-description (description)
   "Print DESCRIPTION for an object in html representation."
-  (figcaption (print-text description)))
+  (when description
+    (figcaption (print-text description))))
 
 (defun print-table (table)
   "Print TABLE in html representation."
