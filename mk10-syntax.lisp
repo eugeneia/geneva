@@ -1,6 +1,6 @@
 ;;;; Defines named readtable for text markup syntax.
 
-(in-package :document.macros)
+(in-package :mk10.macros)
 
 (defun make-markup-reader (constructor)
   "Returns function that reads string literal and applies CONSTRUCTOR."

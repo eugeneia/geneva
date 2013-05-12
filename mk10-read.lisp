@@ -1,54 +1,14 @@
-;;;; Parse a document of plain text format.
+;;;; Read MK10 documents.
 
-(defpackage document.import.plain
+(defpackage mk10.reader
+  (:documentation "Reader for MK10 documents.")
   (:use :cl
-        :document
+        :mk10
+        :mk10.tokens
         :smug
-        :smug.characters)
-  (:import-from :alexandria :flatten)
-  (:export :import-document-plain))
+        :smug.characters))
 
-(in-package :document.import.plain)
-
-
-;;;; Special token definitions
-
-;;; Syntax special characters
-(defparameter *section-start*        #\< "Section start character.")
-(defparameter *section-end*          #\> "Section end character.")
-(defparameter *listing-item*         #\+ "Listing item character.")
-(defparameter *table-item*           #\| "Table item character.")
-(defparameter *object-delimeter*     #\# "Object delimeter character.")
-(defparameter *bold-directive*       #\* "Bold directive character.")
-(defparameter *italic-directive*     #\_ "Bold directive character.")
-(defparameter *code-directive-start* #\{ "Code directive start character.")
-(defparameter *code-directive-end*   #\} "Code directive end character.")
-(defparameter *url-directive-start*  #\[ "Url directive start character.")
-(defparameter *url-directive-end*    #\] "Url directive end character.")
-(defparameter *escape-directive*     #\\ "Escape directive character.")
-
-(defparameter *special-tokens* (list *section-start*
-				     *section-end*
-				     *listing-item*
-				     *table-item*
-				     *object-delimeter*
-				     *escape-directive*)
-  "Special tokens.")
-
-(defparameter *markup-directives* (list *bold-directive*
-					*italic-directive*
-					*code-directive-start*
-					*code-directive-end*
-					*url-directive-start*
-					*url-directive-end*)
-  "Markup directives.")
-
-
-;;; Syntax keywords
-(defparameter *table-keyword* "TABLE" "Table tag word.")
-(defparameter *media-keyword* "MEDIA" "Media tag word.")
-(defparameter *pre-keyword*   "CODE"  "Preformatted text tag word.")
-
+(in-package :mk10.reader)
 
 ;;; Syntax error conditions
 
@@ -346,6 +306,11 @@
 	  (=or (=end-of-document)
 	       (syntax-error 'malformed-object))))
 
-(defun import-document-plain (input)
-  "Parse a document from STREAM and return it."
-  (run (=document) input))
+
+;;; Interface to the reader
+
+(in-package :mk10)
+
+(defun read-mk10 (&optional (input *standard-input*))
+  "Parse MK10 document from INPUT."
+  (run (mk10.reader::=document) input))

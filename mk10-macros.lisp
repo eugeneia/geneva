@@ -1,19 +1,6 @@
 ;;;; Macros for document construction.
 
-(defpackage document.macros
-  (:use :cl
-        :document
-	:named-readtables)
-  (:export :paragraph
-           :listing
-           :table
-           :media
-           :pre
-           :section
-	   :document
-	   :syntax))
-
-(in-package :document.macros)
+(in-package :mk10.macros)
 
 (defmacro paragraph (&rest text)
   "Make a paragraph."

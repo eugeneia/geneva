@@ -1,32 +1,6 @@
-;;;; Simple documents.
+;;;; Internal data format for MK10.
 
-(defpackage document
-  (:use :cl)
-  (:export :+paragraph+
-	   :+listing+
-	   :+table+
-	   :+media+
-	   :+pre+
-	   :+section+
-	   :+bold+
-	   :+italic+
-	   :+code+
-	   :+url+
-	   :make-paragraph
-	   :make-listing
-	   :make-table
-	   :make-media
-	   :make-pre
-	   :make-section
-	   :make-bold
-	   :make-italic
-	   :make-code
-	   :make-url
-	   :content-type
-	   :content-values
-	   :walk-document))
-
-(in-package :document)
+(in-package :mk10)
 
 (defconstant +paragraph+ :p
   "Paragraph symbol.")
