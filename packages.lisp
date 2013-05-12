@@ -28,8 +28,12 @@ documents.")
 	   :make-url
 	   :content-type
 	   :content-values
-	   :walk-document
-           :read-mk10
+	   :walk-document))
+
+(defpackage mk10.serialize
+  (:documentation "Read and print MK10 documents.")
+  (:use :cl)
+  (:export :read-mk10
            :print-mk10))
 
 (defpackage mk10.macros

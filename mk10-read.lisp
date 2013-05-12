@@ -309,7 +309,7 @@
 
 ;;; Interface to the reader
 
-(in-package :mk10)
+(in-package :mk10.serialze)
 
 (defun read-mk10 (&optional (input *standard-input*))
   "Parse MK10 document from INPUT."

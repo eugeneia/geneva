@@ -14,9 +14,13 @@
                (:file "mk10-struct"
                       :depends-on ("packages"))
                (:file "mk10-read"
-                      :depends-on ("packages" "mk10-struct"))
+                      :depends-on ("packages"
+                                   "mk10-struct"
+                                   "mk10-tokens"))
                (:file "mk10-print"
-                      :depends-on ("packages" "mk10-struct"))
+                      :depends-on ("packages"
+                                   "mk10-struct"
+                                   "mk10-tokens"))
 	       (:file "mk10-macros"
                       :depends-on ("packages" "mk10-struct"))
 	       (:file "mk10-syntax"

@@ -160,7 +160,7 @@
 
 ;;; Interface to MK10.PRINTER.
 
-(in-package :mk10)
+(in-package :mk10.serialize)
 
 (defun print-mk10 (document &optional (stream *standard-output*)
                             &key (columns mk10.printer::*columns*))

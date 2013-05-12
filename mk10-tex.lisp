@@ -14,7 +14,7 @@
   (:documentation
    "Export document to TeX document.")
   (:use :cl
-	:document
+	:mk10
         :named-readtables
 	:texp)
   (:export :print-mk10-tex))
