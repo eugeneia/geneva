@@ -11,22 +11,22 @@
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
   :components ((:file "packages")
-               (:file "mk10-struct"
+               (:file "struct"
                       :depends-on ("packages"))
-               (:file "mk10-read"
+               (:file "read"
                       :depends-on ("packages"
-                                   "mk10-struct"
-                                   "mk10-tokens"))
-               (:file "mk10-print"
+                                   "struct"
+                                   "tokens"))
+               (:file "print"
                       :depends-on ("packages"
-                                   "mk10-struct"
-                                   "mk10-tokens"))
-	       (:file "mk10-macros"
-                      :depends-on ("packages" "mk10-struct"))
-	       (:file "mk10-syntax"
+                                   "struct"
+                                   "tokens"))
+	       (:file "macros"
+                      :depends-on ("packages" "struct"))
+	       (:file "syntax"
                       :depends-on ("packages"
-                                   "mk10-struct"
-                                   "mk10-macros")))
+                                   "struct"
+                                   "macros")))
   :depends-on ("smug"
                "pretty-string"
                "split-sequence"

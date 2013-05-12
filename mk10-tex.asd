@@ -6,5 +6,5 @@
 (in-package :mk10.tex-asd)
 
 (defsystem document-export-tex
-  :components ((:file "mk10-tex"))
+  :components ((:file "tex"))
   :depends-on ("mk10" "texp" "named-readtables"))
