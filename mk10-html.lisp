@@ -1,6 +1,6 @@
-;;;; Export document to HTML document.
+;;;; Convert MK10 document to HTML document.
 
-(defpackage document.export.html
+(defpackage mk10.html
   (:use :cl
         :named-readtables
 	:document
@@ -9,8 +9,8 @@
 	:file-types)
   (:shadow :map
            :time)
-  (:export :export-document-html
-           :export-document-index-html))
+  (:export :print-mk10-html
+           :print-mk10-html-index))
 
 (in-package :document.export.html)
 
@@ -167,12 +167,10 @@
   (dolist (content contents)
     (print-content content level)))
 
-(defun export-document-html (document
-                             &key
-                             (stream *standard-output*)
-			     (print-indexed-p t)
-                             (id-prefix *id-prefix*)
-                             (header-level *header-level*))
+(defun print-mk10-html (document &key (stream *standard-output*)
+                                      (print-indexed-p t)
+                                      (id-prefix *id-prefix*)
+                                      (header-level *header-level*))
   "Print DOCUMENT to STREAM in html representation."
   (let ((*standard-output* stream)
 	(*print-indexed-p* print-indexed-p)
@@ -211,10 +209,9 @@
      (increase-level level))))
          
 
-(defun export-document-index-html (document &key
-                                   (stream *standard-output*)
-                                   (id-prefix *id-prefix*)
-				   (print-indexed-p t))
+(defun print-mk10-html-index (document &key (stream *standard-output*)
+                                            (id-prefix *id-prefix*)
+                                            (print-indexed-p t))
   "Print index for DOCUMENT to STREAM in html representation."
     (let ((*standard-output* stream)
           (*id-prefix* id-prefix)
