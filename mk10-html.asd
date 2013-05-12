@@ -7,4 +7,4 @@
 
 (defsystem mk10-html
   :components ((:file "mk10-html"))
-  :depends-on ("document" "html" "file-types"))
+  :depends-on ("mk10" "html" "file-types"))
