@@ -32,7 +32,7 @@ documents.")
            :read-mk10
            :print-mk10))
 
-(defpackage document.macros
+(defpackage mk10.macros
   (:documentation "Macros to ease creating MK10 documents.")
   (:use :cl
         :mk10
