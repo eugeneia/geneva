@@ -1,10 +1,10 @@
-;;;; System definition for document.export.tex.
+;;;; System definition for MK10.TEX.
 
-(defpackage document.export.tex-asd
+(defpackage mk10.tex-asd
   (:use :cl :asdf))
 
-(in-package :document.export.tex-asd)
+(in-package :mk10.tex-asd)
 
 (defsystem document-export-tex
-  :components ((:file "export/tex"))
-  :depends-on ("document" "texp" "named-readtables"))
+  :components ((:file "mk10-tex"))
+  :depends-on ("mk10" "texp" "named-readtables"))

@@ -1,4 +1,4 @@
-;;;; Export document to TeX manuscript.
+;;;; Export MK10 document to TeX manuscript.
 
 ;;;; Requires these macros:
 ;;;; \dbold{#1} \ditalic{#1} \dcode{#1} \durl{#1}
@@ -10,17 +10,16 @@
 ;;;; \dverbatimdescription{#1}
 ;;;; \dsection{#1} \dsubsection{#1} \dsubsubsection{#1}
 
-(defpackage document.export.tex
+(defpackage mk10.tex
   (:documentation
    "Export document to TeX document.")
   (:use :cl
 	:document
         :named-readtables
 	:texp)
-  (:export :export-document-tex
-	   :export-document-index-tex))
+  (:export :print-mk10-tex))
 
-(in-package :document.export.tex)
+(in-package :mk10.tex)
 
 (in-readtable texp:syntax)
 
@@ -132,10 +131,9 @@
   "Print document or section CONTENTS in TeX representation."
   (dolist (content contents) (print-content content)))
 
-(defun export-document-tex (document
-			    &key (stream *standard-output*)
-			         (section-level *section-level*))
-  "Print DOCUMENT to STREAM as a TeX manuscript."
+(defun print-mk10-tex (document &key (stream *standard-output*)
+                                     (section-level *section-level*))
+  "Print MK10 DOCUMENT to STREAM as a TeX manuscript."
   (let ((*standard-output* stream)
 	(*section-level* section-level))
     (print-contents document)))
