@@ -13,6 +13,7 @@
   :components ((:file "packages")
                (:file "struct"
                       :depends-on ("packages"))
+               (:file "tokens")
                (:file "read"
                       :depends-on ("packages"
                                    "struct"
