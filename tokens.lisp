@@ -48,9 +48,7 @@
 (defparameter *markup-directives* (list *bold-directive*
 					*italic-directive*
 					*code-directive-start*
-					*code-directive-end*
-					*url-directive-start*
-					*url-directive-end*)
+					*url-directive-start*)
   "Markup directives.")
 
 
