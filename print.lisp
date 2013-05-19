@@ -1,13 +1,6 @@
 ;;;; Print MK10 documents.
 
-(defpackage mk10.printer
-  (:use :cl
-	:mk10
-        :mk10.tokens
-        :pretty-string
-        :split-sequence))
-
-(in-package :mk10.printer)
+(in-package :mk10.serialize)
 
 (defparameter *columns* 72
   "Maximum line width.")
@@ -158,9 +151,8 @@
                      (print-string ">" :wrap nil)
                      (terpri)))))
 
-;;; Interface to MK10.PRINTER.
 
-(in-package :mk10.serialize)
+;;; Interface to MK10.PRINTER.
 
 (defun print-mk10 (document &optional (stream *standard-output*)
                             &key (columns mk10.printer::*columns*))

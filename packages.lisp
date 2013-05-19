@@ -30,10 +30,40 @@ documents.")
 	   :content-values
 	   :walk-document))
 
+(defpackage mk10.tokens
+  (:documentation "Tokens used by MK10.")
+  (:use :cl)
+  (:export :*section-start*
+           :*section-end*
+           :*listing-item*
+           :*table-item*    
+           :*object-delimeter*
+           :*bold-directive*    
+           :*italic-directive*
+           :*code-directive-start*
+           :*code-directive-end* 
+           :*url-directive-start*
+           :*url-directive-end*
+           :*escape-directive*
+           :*special-tokens*
+           :*markup-directives*
+           :*table-keyword*
+           :*media-keyword*
+           :*pre-keyword*))
+
 (defpackage mk10.serialize
   (:documentation "Read and print MK10 documents.")
-  (:use :cl)
+  (:use :cl
+        :mk10
+        :mk10.tokens
+        :smug
+        :smug.characters
+        :pretty-string
+        :split-sequence)
   (:export :read-mk10
+           :syntax-error
+           :line-position
+           :character-position
            :print-mk10))
 
 (defpackage mk10.macros

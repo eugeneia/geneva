@@ -1,26 +1,5 @@
 ;;;; Tokens used in MK10 document syntax.
 
-(defpackage mk10.tokens
-  (:documentation "Tokens used by MK10.")
-  (:use :cl)
-  (:export :*section-start*
-           :*section-end*
-           :*listing-item*
-           :*table-item*    
-           :*object-delimeter*
-           :*bold-directive*    
-           :*italic-directive*
-           :*code-directive-start*
-           :*code-directive-end* 
-           :*url-directive-start*
-           :*url-directive-end*
-           :*escape-directive*
-           :*special-tokens*
-           :*markup-directives*
-           :*table-keyword*
-           :*media-keyword*
-           :*pre-keyword*))
-
 (in-package :mk10.tokens)
 
 ;;; Syntax special characters

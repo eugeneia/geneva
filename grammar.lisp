@@ -1,6 +1,6 @@
-;;; LPC grammar used by MK10.READER.
+;;;; LPC grammar used by MK10.SERIALZE.
 
-(in-package :mk10.reader)
+(in-package :mk10.serialize)
 
 (defun =escape ()
   (=character *escape-directive*))
@@ -38,15 +38,16 @@
 (defun =text (until)
   (=one-or-more
    (=or (=markup)
-        (=text (=or (=markup-directive)
-                    until)))))
+        (=plain-text (=or (=markup-directive)
+                          until)))))
+
+(defun =newline* ()
+  (=and (=zero-or-more (=unless (=newline) (=whitespace)))
+        (=newline)))
 
 (defun =double-newline ()
-  (let ((newline (=newline))
-	(other-whitespace
-         (=zero-or-more (=unless (=newline) (=whitespace)))))
-    (=and other-whitespace newline
-	  other-whitespace newline)))
+  (=and (=newline*)
+        (=newline*)))
 
 (defun =end-of-document ()
   (=skip-whitespace (=end-of-input)))
@@ -68,12 +69,59 @@
   (=prog1 (=one-or-more (=list-item))
           (=content-delimiter)))
 
-;;; continue...
+(defun =object% (keyword constructor parser)
+  (let ((delim (=token *object-delimeter*)))
+    (=let* ((_ (=and delim (=string keyword nil) delim))
+            (description (=text (=or delim
+                                     (=content-delimiter))))
+            (_ (=or delim
+                    ;; Description is not terminated properly
+                    (=syntax-error 'malformed-object)))
+            (body parser))
+      (=result (funcall constructor description body)))))
+
+(defun =url ()
+  "We are really liberal as to whats a valid URL. That decision is
+outside of MK10's scope. We even allow multiline strings with escaped
+newlines."
+  (=prog1 (=string-of (=not (=token #\Newline)))
+          (=or (=content-delimiter)
+               ;; Object is not terminated properly
+               (=syntax-error 'malformed-object))))
+
+(defun =table-column ()
+  (=and (=skip-whitespace (=token *table-item*))
+        (=text (=newline*))))
+
+(defun =table-row ()
+  (=prog1 (=one-or-more (=table-column))
+          (=newline*)))
+
+(defun =table-body ()
+  (=prog1 (=one-or-more (=table-row))
+          (=or (=newline*)
+               (=content-delimiter)
+               ;; Object is not terminated properly
+               (=syntax-error 'malformed-object))))
+
+(defun =code-terminator ()
+  (=and (=token *object-delimeter*)
+        (=content-delimiter)))
+
+(defun =code-line ()
+  (=unless (=code-terminator)
+           (=line t)))
+
+(defun =code-body ()
+  (=let* ((lines (=zero-or-more (=code-line)))
+          (_ (=or (=code-terminator)
+                  (=syntax-error 'malformed-object))))
+    (=result (apply #'concatenate 'string lines))))
 
 (defun =object ()
-  (=or (=object% :media #'make-media (=url))
-       (=object% :table #'make-table (=table-body))
-       (=object% :code  #'make-code  (=code-body))))
+  (=or (=object% *media-keyword* #'make-media (=url))
+       (=object% *table-keyword* #'make-table (=table-body))
+       (=object% *pre-keyword*   #'make-pre   (=code-body))))
 
 (defun =section ()
   (=handler-case
@@ -98,8 +146,8 @@
          (=paragraph)))))
 
 (defun =document ()
-  (=prog1 (=contents)
-          (=or (=end-of-document)
-               ;; Unless all input was successfully parsed something went
-               ;; wrong.
-               (=syntax-error 'unrecognized-input))))
+  (=prog1
+   (=contents)
+   (=or (=end-of-document)
+        ;; Unless all input was successfully parsed something went wrong.
+        (=syntax-error 'unrecognized-input))))

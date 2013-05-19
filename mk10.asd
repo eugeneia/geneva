@@ -13,11 +13,19 @@
   :components ((:file "packages")
                (:file "struct"
                       :depends-on ("packages"))
-               (:file "tokens")
+               (:file "tokens"
+                      :depends-on ("packages"))
+               (:file "grammar-errors"
+                      :depends-on ("packages"))
+               (:file "grammar"
+                      :depends-on ("packages"
+                                   "grammar-errors"))
                (:file "read"
                       :depends-on ("packages"
                                    "struct"
-                                   "tokens"))
+                                   "tokens"
+                                   "grammar-errors"
+                                   "grammar"))
                (:file "print"
                       :depends-on ("packages"
                                    "struct"
