@@ -48,7 +48,7 @@
    "We don't know whats wrong. Should really never happen."))
 
 
-;;; Error signaling routine,
+;;; Error signaling routine
 
 (defun =syntax-error (error)
   "Signal ERROR at current position."

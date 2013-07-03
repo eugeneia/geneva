@@ -1,6 +1,6 @@
-;;;; LPC grammar used by MK10.SERIALZE.
+;;;; MPC grammar used by GENEVA.MK2.
 
-(in-package :mk10.serialize)
+(in-package :geneva.mk2)
 
 (defun =escape ()
   (=character *escape-directive*))
@@ -136,7 +136,6 @@ newlines."
    (section-not-closed () (=syntax-error 'open-section))))
 
 (defun =contents ()
-  ;; No content is valid content.
   (=zero-or-more
    ;; Leading whitespace is insignificant.
    (=skip-whitespace

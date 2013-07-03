@@ -1,7 +1,7 @@
-;;;; Read MK10 documents.
+;;;; Read mk2 documents.
 
-(in-package :mk10.serialize)
+(in-package :geneva.mk2)
 
-(defun read-mk10 (&optional (input *standard-input*))
-  "Parse MK10 document from INPUT."
-  (run (mk10.reader::=document) input))
+(defun read-mk2 (&optional (input *standard-input*))
+  "Read MK2 document from INPUT."
+  (run (=document) input))
