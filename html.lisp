@@ -4,17 +4,17 @@
   (:use :cl
         :named-readtables
 	:mk10
-	:html
-	:html.widgets
+	:macro-html
+	:macro-html.widgets
 	:file-types)
   (:shadow :map
            :time)
   (:export :print-mk10-html
            :print-mk10-html-index))
 
-(in-package :document.export.html)
+(in-package :geneva.html)
 
-(in-readtable html:syntax)
+(in-readtable macro-html:syntax)
 
 (defvar *header-level* 0
   "Header level.")
