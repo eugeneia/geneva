@@ -27,8 +27,8 @@
   (:use :cl
         :geneva
         :mk2.tokens
-        :smug
-        :smug.characters
+        :mpc
+        :mpc.characters
         :pretty-string
         :split-sequence)
   (:export :read-mk2

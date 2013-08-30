@@ -22,4 +22,4 @@
                (:file "print"
                       :depends-on ("mk2"
                                    "tokens")))
-  :depends-on ("smug" "pretty-string" "split-sequence"))
+  :depends-on ("mpc" "pretty-string" "split-sequence"))
