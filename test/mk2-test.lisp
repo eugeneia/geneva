@@ -5,7 +5,10 @@
         :mpc
         :geneva
         :geneva.mk2)
-  (:export :test-mk2))
+  (:export :test-paragraph
+           :test-listing
+           :test-table
+           :test-mk2))
 
 (in-package :geneva.mk2-test)
 
@@ -63,9 +66,9 @@
 
 (defun random-table ()
   "Generate random table."
-  (let ((columns (random*)))
+  (let ((columns (1+ (random 4))))
     (make-table (random-text)
-                (collect-n (random*)
+                (collect-n (1+ (random 4))
                   (collect-n columns (random-text))))))
 
 (defun random-media ()
@@ -114,7 +117,7 @@ PARSER."
                 (geneva.mk2::print-content object)))
          (read-object (funcall parser mk2)))
     (unless (equal object read-object)
-      (format t "FAIL:~%~:S~%~:S~%~%" object read-object))))
+      (format t "FAIL:~%~a~:S~%~:S~%~%" mk2 object read-object))))
 
 (defun test-paragraph ()
   "Test MK2 paragraph printing and parsing."
@@ -125,6 +128,11 @@ PARSER."
   "Test MK2 listing printing and parsing."
   (test-integrity (random-listing)
                   (mk2-parser (geneva.mk2::=listing))))
+
+(defun test-table ()
+  "Test MK2 table printing and parsing."
+  (test-integrity (random-table)
+                  (mk2-parser (geneva.mk2::=object))))
 
 (defun test-mk2 (&optional (tests '(test-paragraph
                                     test-listing)))
