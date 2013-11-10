@@ -84,33 +84,38 @@
     ;; DELIM KEYWORD TEXT DELIM PARSER.
     (=let* ((_ (=and delim (=string keyword nil)))
             (description (=text (=or delim (=content-delimiter))))
-            (_ (=or delim
+            (_ (=or (=and delim (=newline*))
                     ;; Description is not terminated properly
                     (=syntax-error 'malformed-object)))
             (body parser))
       (=result (funcall constructor description body)))))
 
+(defun =skip-horizontal-space (parser)
+  "Skip horizontal whitespace and apply PARSER."
+  (=and (=zero-or-more (=unless (=newline) (=whitespace)))
+        parser))
+
 (defun =url ()
   "We are really liberal as to whats a valid URL. That decision is
 outside of MK2's scope. We even allow multiline strings with escaped
 newlines."
-  (=prog1 (=skip-whitespace (=string-of (=not (=token #\Newline))))
+  (=prog1 (=skip-horizontal-space (=string-of (=not (=token #\Newline))))
           (=or (=content-delimiter)
                ;; Object is not terminated properly
                (=syntax-error 'malformed-object))))
 
 (defun =table-column ()
-  (=and (=skip-whitespace (=token *table-item*))
-        (=text (=newline*))))
+  (=and (=token *table-item*)
+        (=text (=or (=token *table-item*)
+                    (=newline*)))))
 
 (defun =table-row ()
-  (=prog1 (=one-or-more (=table-column))
-          (=newline*)))
+  (=one-or-more
+   (=skip-horizontal-space (=table-column))))
 
 (defun =table-body ()
-  (=prog1 (=one-or-more (=table-row))
-          (=or (=newline*)
-               (=content-delimiter)
+  (=prog1 (=one-or-more (=prog1 (=table-row) (=newline*)))
+          (=or (=content-delimiter)
                ;; Object is not terminated properly
                (=syntax-error 'malformed-object))))
 
