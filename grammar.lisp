@@ -21,22 +21,27 @@
 
 (defun =markup% (constructor start &optional (end start))
   (=let* ((_ (=token start))
-          (text (=plain-text (=token end)))
+          (text (=or (=plain-text (=token end)) (=result "")))
           (_ (=token end)))
     (=result (funcall constructor text))))
 
 (defun =markup ()
-  (=or
-   (=markup% #'make-bold   *bold-directive*)
-   (=markup% #'make-italic *italic-directive*)
-   (=markup% #'make-code   *code-directive-start* *code-directive-end*)
-   (=markup% #'make-url    *url-directive-start*  *url-directive-end*)))
+  (=or (=markup% #'make-bold
+                 *bold-directive*)
+       (=markup% #'make-italic
+                 *italic-directive*)
+       (=markup% #'make-fixed-width
+                 *fixed-width-directive-start*
+                 *fixed-width-directive-end*)
+       (=markup% #'make-url
+                 *url-directive-start*
+                 *url-directive-end*)))
 
 (defun =markup-directive ()
   (=one-of *markup-directives*))
 
 (defun =text (until)
-  (=one-or-more
+  (=zero-or-more
    (=or (=markup)
         (=plain-text (=or (=markup-directive)
                           until)))))
@@ -57,8 +62,12 @@
        (=end-of-document)))
 
 (defun =paragraph ()
-  (=prog1 (=text (=content-delimiter))
-          (=content-delimiter)))
+  (=let* ((text (=text (=or (=content-delimiter)
+                            (=token *section-end*))))
+          (_ (=content-delimiter)))
+    (if text
+        (=result (make-paragraph text))
+        (=fail))))
 
 (defun =list-item ()
   (=prog2 (=token *listing-item*)
@@ -66,14 +75,15 @@
                       (=content-delimiter)))))
 
 (defun =listing ()
-  (=prog1 (=one-or-more (=list-item))
-          (=content-delimiter)))
+  (=let* ((items (=one-or-more (=list-item)))
+          (_ (=content-delimiter)))
+    (=result (make-listing items))))
 
 (defun =object% (keyword constructor parser)
   (let ((delim (=token *object-delimeter*)))
-    (=let* ((_ (=and delim (=string keyword nil) delim))
-            (description (=text (=or delim
-                                     (=content-delimiter))))
+    ;; DELIM KEYWORD TEXT DELIM PARSER.
+    (=let* ((_ (=and delim (=string keyword nil)))
+            (description (=text (=or delim (=content-delimiter))))
             (_ (=or delim
                     ;; Description is not terminated properly
                     (=syntax-error 'malformed-object)))
@@ -82,9 +92,9 @@
 
 (defun =url ()
   "We are really liberal as to whats a valid URL. That decision is
-outside of MK10's scope. We even allow multiline strings with escaped
+outside of MK2's scope. We even allow multiline strings with escaped
 newlines."
-  (=prog1 (=string-of (=not (=token #\Newline)))
+  (=prog1 (=skip-whitespace (=string-of (=not (=token #\Newline))))
           (=or (=content-delimiter)
                ;; Object is not terminated properly
                (=syntax-error 'malformed-object))))
@@ -105,11 +115,12 @@ newlines."
                (=syntax-error 'malformed-object))))
 
 (defun =code-terminator ()
-  (=and (=token *object-delimeter*)
+  (=and (=skip-whitespace (=token *object-delimeter*))
         (=content-delimiter)))
 
 (defun =code-line ()
-  (=unless (=code-terminator)
+  (=unless (=or (=code-terminator)
+                (=end-of-input))
            (=line t)))
 
 (defun =code-body ()
@@ -119,14 +130,15 @@ newlines."
     (=result (apply #'concatenate 'string lines))))
 
 (defun =object ()
-  (=or (=object% *media-keyword* #'make-media (=url))
-       (=object% *table-keyword* #'make-table (=table-body))
-       (=object% *pre-keyword*   #'make-pre   (=code-body))))
+  (=or (=object% *media-keyword*     #'make-media     (=url))
+       (=object% *table-keyword*     #'make-table     (=table-body))
+       (=object% *plaintext-keyword* #'make-plaintext (=code-body))))
 
 (defun =section ()
   (=handler-case
    (=let* ((_ (=token *section-start*))
-           (header (=paragraph))
+           (header (=text (=content-delimiter)))
+           (_ (=content-delimiter))
            (contents (=contents))
            (_ (=or (=skip-whitespace (=token *section-end*))
                    ;; Sections must be closed aye.

@@ -68,7 +68,7 @@ lists) of text."
 
 (defun make-markup (type string)
   "Make markup of TYPE for STRING."
-  (list type (trim-whitespace string)))
+  (list type string))
 
 (defun make-bold (string)
   "Make bold text token for STRING.."

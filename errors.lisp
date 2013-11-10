@@ -1,6 +1,6 @@
 ;;;; Error conditions and routines for the grammar used by MK10.READER.
 
-(in-package :mk10.serialize)
+(in-package :geneva.mk2)
 
 
 ;;; Syntax error conditions

@@ -30,7 +30,7 @@ programatically create and traverse Geneva document..")
 	   :walk-document))
 
 (defpackage geneva.macros
-  (:documentation "(Read) macros to ease creating Geneva documents.")
+  (:documentation "Reader macros to ease creating Geneva documents.")
   (:use :cl
         :geneva
 	:named-readtables)

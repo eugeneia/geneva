@@ -1,6 +1,6 @@
-;;;; Print MK10 documents.
+;;;; Print mk2 documents.
 
-(in-package :mk10.serialize)
+(in-package :geneva.mk2)
 
 (defparameter *columns* 72
   "Maximum line width.")
@@ -58,10 +58,10 @@
                    (escape (content-values markup))
                    delimiter2)))
     (ecase (content-type markup)
-      (#.+bold+    (escape-and-decorate #\*))
-      (#.+italic+  (escape-and-decorate #\_))
-      (#.+code+    (escape-and-decorate #\{ #\}))
-      (#.+url+     (escape-and-decorate #\[ #\])))))
+      (#.+bold+      (escape-and-decorate #\*))
+      (#.+italic+    (escape-and-decorate #\_))
+      (#.+fixed-width+ (escape-and-decorate #\{ #\}))
+      (#.+url+       (escape-and-decorate #\[ #\])))))
 
 (defun text-string (text)
   "Return string for TEXT."
@@ -72,14 +72,16 @@
                         (markup-string item))))))
 
 (defun listing-string (items)
-  "Return lsting string for ITEMS."
+  "Return listing string for ITEMS."
   (with-output-to-string (*standard-output*)
     (dolist (item items)
       (format t "+ ~a~%" (text-string item)))))
 
-(defun caption-string (type caption)
-  "Return caption string for TYPE and CAPTION."
-  (format nil "#~a ~a#" type (text-string caption)))
+(defun caption-string (type-string caption)
+  "Return caption string for TYPE-STRING and CAPTION."
+  (format nil "#~a~@[ ~a~]#"
+          (string-downcase type-string)
+          (when caption (text-string caption))))
 
 (defun table-string (rows)
   "Return string for ROWS."
@@ -118,18 +120,21 @@
 
     (#.+table+     (multiple-value-bind (caption rows)
                        (content-values content)
-                     (print-string (caption-string "table" caption))
+                     (print-string
+                      (caption-string *table-keyword* caption))
                      (print-string (table-string rows) :wrap nil)))
 
     (#.+media+     (multiple-value-bind (caption url)
                        (content-values content)
-                     (print-string (caption-string "media" caption))
+                     (print-string
+                      (caption-string *media-keyword* caption))
                      (print-string url :wrap nil)
                      (terpri)))
 
-    (#.+pre+       (multiple-value-bind (caption pre)
+    (#.+plaintext+ (multiple-value-bind (caption pre)
                        (content-values content)
-                     (print-string (caption-string "code" caption))
+                     (print-string
+                      (caption-string *plaintext-keyword* caption))
                      (print-string pre :wrap nil)
                      (print-string "#" :wrap nil)
                      (terpri)))
@@ -151,15 +156,12 @@
                      (print-string ">" :wrap nil)
                      (terpri)))))
 
-
-;;; Interface to MK10.PRINTER.
-
-(defun print-mk10 (document &optional (stream *standard-output*)
-                            &key (columns mk10.printer::*columns*))
+(defun print-mk2 (document &optional (stream *standard-output*)
+                           &key (columns *columns*))
   "Print DOCUMENT to STREAM optimized for COLUMNS."
-  (let ((mk10.printer::*columns* columns)
+  (let ((*columns* columns)
         (*standard-output* stream)
-        (mk10.printer::*indent* 0)
-        (mk10.printer::*beginning* t))
+        (*indent* 0)
+        (*beginning* t))
     (dolist (content document)
-      (mk10.printer::print-content content))))
+      (print-content content))))

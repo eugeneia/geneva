@@ -46,5 +46,4 @@
 ;;; Syntax keywords
 (defparameter *table-keyword* "TABLE" "Table tag word.")
 (defparameter *media-keyword* "MEDIA" "Media tag word.")
-(defparameter *plaintext-keyword* "PLAINTEXT" "Plaintext tag word.")
-
+(defparameter *plaintext-keyword* "CODE" "Plaintext tag word.")
