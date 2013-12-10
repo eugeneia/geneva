@@ -1,0 +1,39 @@
+_Geneva_ is the portable document preparation system. It follows the
+principle _Write once, read anywhere_. The system isolates document
+content and structure from document presentation and thereby enables the
+creation and archival of highly portable documents.
+
+_Geneva_ achieves this by employing a generic but well defined document
+structure in conjunction with a diverse toolchain composed of input
+interfaces and presentation backends. In addition to classic document
+features such as paragraphs, listings, sections, tables and text markup,
+_Geneva_ defines a generic media type designed to be used to embed
+arbitrary figures and enable extensibility in a plug-in oriented way.
+
+The input interfaces, such as the plain text oriented {mk2} markup
+language and the Geneva API, are user and programmer facing frontends to
+document authoring. The presentation backends render documents to several
+targets including web, print and plain text media.
+
+#media Diagram of _Geneva_ components.#
+geneva-components.png
+
+
+< Documentation
+
+ + _Geneva_ document specification [specification.mk2]
+ + {GENEVA} API [geneva-api.mk2]
+ + {GENEVA-MK2}, the {mk2} markup language [mk2.mk2]
+
+ + {GENEVA-PLANTEXT}, plaintext backend [geneva-html.mk2]
+ + {GENEVA-HTML}, web media backend [geneva-html.mk2]
+ + {GENEVA-TEX}, print media backend [geneva-tex.mk2]
+
+>
+
+
+< Maintainer
+
+ Max Rottenkolber [mailto:max@mr.gy]
+
+>
