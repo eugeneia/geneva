@@ -4,10 +4,14 @@
   (:use :cl
         :mpc
         :geneva
-        :geneva.mk2)
-  (:export :test-paragraph
-           :test-listing
-           :test-table
+        :geneva.mk2
+        :mk2.tokens)
+  (:export :random-paragraph
+           :random-listing
+           :random-table
+           :random-media
+           :random-plaintext
+           :random-section
            :test-mk2))
 
 (in-package :geneva.mk2-test)
@@ -15,7 +19,7 @@
 (defparameter *character-range* 256
   "Range for random character values.")
 
-(defparameter *test-iterations* 32
+(defparameter *test-iterations* 4
   "Number of test iterations.")
 
 (defmacro one-of (&body body)
@@ -26,11 +30,26 @@
                for form in body
             collect `(,i ,form)))))
 
+(defun random-character ()
+  (one-of #\x #\Space
+          *section-start*
+          *section-end*
+          *listing-item*
+          *table-item*
+          *object-delimeter*
+          *bold-directive*
+          *italic-directive*
+          *fixed-width-directive-start*
+          *fixed-width-directive-end*
+          *url-directive-start*
+          *url-directive-end*
+          *escape-directive*))
+
 (defun random-string (length)
   "Return a random string of LENGTH."
   (let ((string (make-string length)))
     (loop for i from 0 to (1- length)
-       do (setf (aref string i) (one-of #\x #\Space)))
+       do (setf (aref string i) (random-character)))
     string))
 
 (defun random* ()
@@ -83,7 +102,7 @@
   "Generate random section."
   (make-section (random-text)
                 (collect-n (random*)
-                  ;; 50/50 chance of possible subsection.
+                  ;; 50% chance of possible subsection.
                   (one-of (one-of (random-paragraph)
                                   (random-listing)
                                   (random-table)
@@ -101,43 +120,31 @@
           (random-plaintext)
           (random-section)))
 
-(defun random-document ()
-  "Generate a random document."
+(defun random-elements ()
+  "Generate a list of random elements."
   (collect-n (random*) (random-element)))
 
-(defun mk2-parser (parser)
-  "Return parser for PARSER function."
-  (lambda (in)
-    (run parser in)))
+(defun test-integrity (elements)
+  "Perform integrity test for ELEMENTS, printed and subsequently parsed."
+  (let* ((document (make-document elements))
+         (mk2 (with-output-to-string (*standard-output*)
+                (print-mk2 document)))
+         read-document)
+    (handler-case
+        (progn (setf read-document (read-mk2 mk2))
+               (assert (equal document read-document)))
+      (error (error)
+        (format t "FAIL: ~a ~S~%~a~:S~%~:S~%~%"
+                error error mk2 document read-document)))))
 
-(defun test-integrity (object parser)
-  "Perform integrity test for OBJECT, printed and subsequently parsed by
-PARSER."
-  (let* ((mk2 (with-output-to-string (*standard-output*)
-                (geneva.mk2::print-content object)))
-         (read-object (funcall parser mk2)))
-    (unless (equal object read-object)
-      (format t "FAIL:~%~a~:S~%~:S~%~%" mk2 object read-object))))
-
-(defun test-paragraph ()
-  "Test MK2 paragraph printing and parsing."
-  (test-integrity (random-paragraph)
-                  (mk2-parser (geneva.mk2::=paragraph))))
-
-(defun test-listing ()
-  "Test MK2 listing printing and parsing."
-  (test-integrity (random-listing)
-                  (mk2-parser (geneva.mk2::=listing))))
-
-(defun test-table ()
-  "Test MK2 table printing and parsing."
-  (test-integrity (random-table)
-                  (mk2-parser (geneva.mk2::=object))))
-
-(defun test-mk2 (&optional (tests '(test-paragraph
-                                    test-listing)))
+(defun test-mk2 (&rest tests)
   "Run TESTS."
-  (loop for test in tests do
-       (format t "~A~%" test)
-       (dotimes (i *test-iterations*) 
-         (funcall (symbol-function test)))))
+  (if tests
+      (loop for test in tests do
+           (format t "~A~%" test)
+           (dotimes (i *test-iterations*)
+             (test-integrity (list (funcall test)))))
+      (progn
+        (format t "DOCUMENT~%")
+        (dotimes (i *test-iterations*)
+          (test-integrity (random-elements))))))
