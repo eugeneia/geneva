@@ -96,9 +96,8 @@
         parser))
 
 (defun =url ()
-  "We are really liberal as to whats a valid URL. That decision is
-outside of MK2's scope. We even allow multiline strings with escaped
-newlines."
+  "We are liberal as to whats a valid URL. That decision is out of scope.
+We even allow multiline strings with escaped newlines."
   (=prog1 (=skip-horizontal-space (=string-of (=not (=token #\Newline))))
           (=or (=content-delimiter)
                ;; Object is not terminated properly
@@ -122,25 +121,26 @@ newlines."
                ;; Object is not terminated properly
                (=syntax-error 'malformed-object))))
 
-(defun =code-terminator ()
+(defun =plaintext-terminator ()
   (=and (=skip-whitespace (=token *object-delimeter*))
         (=content-delimiter)))
 
-(defun =code-line ()
-  (=unless (=or (=code-terminator)
-                (=end-of-input))
+(defun =plaintext-line ()
+  (=unless (=or (=plaintext-terminator)
+                (=end-of-document))
            (=line)))
 
-(defun =code-body ()
-  (=let* ((lines (=zero-or-more (=code-line)))
-          (_ (=or (=code-terminator)
+(defun =plaintext-body ()
+  (=let* ((lines (=zero-or-more (=plaintext-line)))
+          (_ (=or (=plaintext-terminator)
                   (=syntax-error 'malformed-object))))
-    (=result (apply #'concatenate 'string lines))))
+    (=result (format nil "~{~&~a~}" lines))))
 
 (defun =object ()
-  (=or (=object% *media-keyword*     #'make-media     (=url))
-       (=object% *table-keyword*     #'make-table     (=table-body))
-       (=object% *plaintext-keyword* #'make-plaintext (=code-body))))
+  (=or
+   (=object% *media-keyword*     #'make-media     (=url))
+   (=object% *table-keyword*     #'make-table     (=table-body))
+   (=object% *plaintext-keyword* #'make-plaintext (=plaintext-body))))
 
 (defun =section ()
   (=handler-case

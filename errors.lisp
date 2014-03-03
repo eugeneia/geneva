@@ -34,14 +34,16 @@
    Should print "SYNTAX-ERROR at position 10:17." twice. |#
 
 (define-condition malformed-object (syntax-error) ()
-  (:documentation "Syntax error describing a malformed object."))
+  (:documentation
+   "Syntax error describing a malformed object."))
 
 (define-condition section-not-closed (syntax-error) ()
   (:documentation
    "Internal syntax error describing an unclosed section."))
 
 (define-condition open-section (syntax-error) ()
-  (:documentation "Syntax error describing an open section."))
+  (:documentation
+   "Syntax error describing an open section."))
 
 (define-condition unrecognized-input (syntax-error) ()
   (:documentation
