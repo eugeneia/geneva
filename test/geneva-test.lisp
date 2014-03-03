@@ -72,7 +72,10 @@
                   '(" " (:i "") " Hello world " " what "
                     (:b "are you") " "))
                  '("Hello world what "
-                   (:B "are you")))))
+                   (:B "are you"))))
+  (assert (equal (geneva::normalize-text
+                  '("" (:i " ") " f " (:b " ") ""))
+                 '("f"))))
 
 (defun test-normalize-plaintext ()
   "Test NORMALIZE-PLAINTEXT."
