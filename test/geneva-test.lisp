@@ -1,6 +1,6 @@
 ;;;; Tests for GENEVA.
 
-(defpackage geneva-test
+(defpackage geneva.test
   (:use :cl
         :geneva)
   (:export :test-join-strings
@@ -9,7 +9,7 @@
            :test-normalize-text
            :test-normalize-plaintext))
 
-(in-package :geneva-test)
+(in-package :geneva.test)
 
 (defun test-join-strings ()
   "Test JOIN-STRINGS."
