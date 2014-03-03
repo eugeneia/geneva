@@ -129,7 +129,7 @@ newlines."
 (defun =code-line ()
   (=unless (=or (=code-terminator)
                 (=end-of-input))
-           (=line t)))
+           (=line)))
 
 (defun =code-body ()
   (=let* ((lines (=zero-or-more (=code-line)))

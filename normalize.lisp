@@ -115,7 +115,7 @@ superfluous whitespace."
                                    (char= #\Space char))
                                  line)
                     when start minimize start)))
-    (format nil "~{~a~%~}" (mapcar (lambda (line)
+    (format nil "~{~&~a~}" (mapcar (lambda (line)
                                      (if (> (length line) 0)
                                          (subseq line indent)
                                          line))
