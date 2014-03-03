@@ -5,7 +5,7 @@
 
 ;;; Syntax error conditions
 
-(define-condition syntax-error ()
+(define-condition syntax-error (error)
   ((line-position
     :type (unsigned integer)
     :initform (error "Must supply LINE-POSITION.")
