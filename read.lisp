@@ -4,4 +4,4 @@
 
 (defun read-mk2 (&optional (input *standard-input*))
   "Read MK2 document from INPUT."
-  (run (=document) input))
+  (make-document (run (=document) input)))
