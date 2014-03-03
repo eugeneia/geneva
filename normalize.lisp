@@ -43,6 +43,23 @@
       (list (first item)
             (normalize-whitespace (second item) :trim trim))))
 
+(defun position-non-whitespace-item (text &optional from-end)
+  "Get position of first non-whitespace item in TEXT and maybe start
+FROM-END."
+  (labels ((whitespace-p (c) (member c *whitespace*))
+           (whitespace-item-p (item)
+             (not (find-if-not #'whitespace-p
+                               (if (stringp item)
+                                   item
+                                   (second item))))))
+    (position-if-not #'whitespace-item-p text :from-end from-end)))
+
+(defun trim-whitespace-items (text)
+  "Remove whitespace from start and end of TEXT."
+  (let ((start (position-non-whitespace-item text)))
+    (when start
+      (subseq text start (1+ (position-non-whitespace-item text t))))))
+
 (defun normalize-text-whitespace (text)
   "Remove obsoltete whitespace from TEXT."
   (case (length text)
@@ -52,13 +69,13 @@
     (1 `(,(normalize-text-item (first text) :trim :both)))
     ;; (X Y) → Trim X left, trim Y right.
     (2 `(,(normalize-text-item (first text) :trim :left)
-          ,(normalize-text-item (second text) :trim :right)))
+         ,(normalize-text-item (second text) :trim :right)))
     ;; (X1 .. Xn) → Trim X1 left, trim Xn right.
     (otherwise
      `(,(normalize-text-item (first text) :trim :left)
-        ,@(loop for item in (butlast (rest text))
-             collect (normalize-text-item item))
-        ,(normalize-text-item (first (last text)) :trim :right)))))
+       ,@(loop for item in (butlast (rest text))
+            collect (normalize-text-item item))
+       ,(normalize-text-item (first (last text)) :trim :right)))))
 
 (defun remove-empty-markup (text)
   "Remove empty markup from TEXT."
@@ -76,12 +93,22 @@
 superfluous whitespace."
   (remove ""
           (normalize-text-whitespace
-           (join-strings (remove-empty-markup text)))
+           (trim-whitespace-items
+            (join-strings
+             (remove-empty-markup text))))
           :test #'equal))
 
+(defun trim-whitespace-suffixes (lines)
+  "Trim whitespace suffixes from LINE."
+  (loop for line in lines collect
+       (string-right-trim *whitespace* line)))
+
 (defun normalize-plaintext (string)
-  "Remove global indent from plaintext STRING."
-  (let* ((lines (split-sequence #\Newline string))
+  "Remove leading and ending whitespace, global indent and whitespace
+  line-suffixes from plaintext STRING ."
+  (let* ((lines (trim-whitespace-suffixes
+                 (trim-whitespace-items
+                  (split-sequence #\Newline string))))
          (indent (loop for line in lines
                     for start = (position-if-not
                                  (lambda (char)
