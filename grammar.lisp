@@ -114,8 +114,11 @@ newlines."
    (=skip-horizontal-space (=table-column))))
 
 (defun =table-body ()
-  (=prog1 (=one-or-more (=prog1 (=table-row) (=newline*)))
+  (=prog1 (=one-or-more (=prog1 (=table-row)
+                                (=maybe (=newline*))))
           (=or (=content-delimiter)
+               ;; Single newline is ok in case last row ate one.
+               (=newline*)
                ;; Object is not terminated properly
                (=syntax-error 'malformed-object))))
 
