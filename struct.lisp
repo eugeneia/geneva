@@ -62,9 +62,9 @@ lists) of text."
   (make-object +plaintext+ description
                (normalize-plaintext plaintext)))
 
-(defun make-section (header document)
-  "Make section for HEADER and DOCUMENT body."
-  (make-object +section+ header document))
+(defun make-section (header elements)
+  "Make section for HEADER and ELEMENTS."
+  (make-object +section+ header (make-document elements)))
 
 (defun make-markup (type string)
   "Make markup of TYPE for STRING."
@@ -85,6 +85,11 @@ lists) of text."
 (defun make-url (string)
   "Make URL link text token for STRING."
   (make-markup +url+ string))
+
+(defun make-document (contents)
+  "Make document with CONTENTS."
+  (remove '(:p nil) contents
+          :test #'equal))
 
 (defun content-type (content)
   "Returns CONTENT's type."

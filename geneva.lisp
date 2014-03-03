@@ -25,6 +25,7 @@ programatically create and traverse Geneva document..")
 	   :make-italic
 	   :make-fixed-width
 	   :make-url
+           :make-document
 	   :content-type
 	   :content-values
 	   :walk-document))
