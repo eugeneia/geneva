@@ -107,6 +107,21 @@
 				(length item))))
 	  (terpri))))))
 
+(defun print-plaintext (string)
+  "Print STRING as plaintext body (with escaped
+<object-deilimiter> <element-delimiter> sequences)."
+  (let ((terminator (format nil "~%#~%~%"))
+        (escaped (format nil "~%\\#~%~%")))
+    (loop for start = 0 then (+ pos (length terminator))
+          for pos = (search terminator string :start1 1 :start2 start)
+                    then (search terminator string :start2 start)
+       do (write-string string *standard-output* :start start :end pos)
+       when pos do
+         (case pos
+           (0 (write-string escaped *standard-output* :start 1))
+           (otherwise (write-string escaped)))
+       while pos)))
+
 (defun print-content (content)
   "Print CONTENT."
   (ecase (content-type content)
@@ -135,7 +150,8 @@
                        (content-values content)
                      (print-string
                       (caption-string *plaintext-keyword* caption))
-                     (print-string pre :wrap nil)
+                     (print-plaintext pre)
+                     (format t "~&")
                      (print-string "#" :wrap nil)
                      (terpri)))
 
@@ -157,7 +173,7 @@
                      (terpri)))))
 
 (defun print-mk2 (document &optional (stream *standard-output*)
-                           &key (columns *columns*))
+                           &key      (columns *columns*))
   "Print DOCUMENT to STREAM optimized for COLUMNS."
   (let ((*columns* columns)
         (*standard-output* stream)

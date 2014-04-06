@@ -17,7 +17,7 @@
   "Whitespace characters we do consider.")
 
 (defun normalize-whitespace (string &key trim)
-  "Normalize *WHITESPACE* in STRING and optionally TRIM :LEFT or
+  "Normalize *WHITESPACE* in STRING and optionally TRIM :LEFT,
 :RIGHT or :BOTH."
   (let* ((words (split-sequence-if
                  (lambda (char)
@@ -114,10 +114,10 @@ superfluous whitespace."
                                  (lambda (char)
                                    (char= #\Space char))
                                  line)
-                    when start minimize start)))
-    (format nil "~{~&~a~}" (mapcar (lambda (line)
-                                     (if (> (length line) 0)
-                                         (subseq line indent)
-                                         line))
-                                   lines))))
-
+                    when start minimize start))
+         (unindented (mapcar (lambda (line)
+                               (if (> (length line) 0)
+                                   (subseq line indent)
+                                   line))
+                             lines)))
+    (format nil "~{~a~^~%~}" unindented)))
