@@ -1,0 +1,76 @@
+A _Geneva document_ is an ordered collection of _elements_. Geneva
+defines the following _element types_:
+
+ + Pargraph
+ + Listing
+ + Table
+ + Plaintext
+ + Media
+
+
+< Rich text
+
+ A central component of all element types is _rich text_. Rich text is
+ defined as a sequence of _text tokens_, each made up of a character
+ string and an attribute to signify its appearance. There are five
+ different types of text tokens:
+
+ #table Text token types.#
+ | Name   | Description
+ | plain  | Render sequence in regular font.
+ | bold   | Recommends to render sequence in bold font.
+ | italic | Recommends to render sequence in italic font.
+ | code   | Recommends to render sequence in fixed-width font.
+ | uri    | Interpret sequence as _Uniform Resource Identifier_.
+
+ The occurrance of _whitespace characters_ text tokens is restricted by
+ the following rules:
+
+  + Whitespace character sequences of length two or more are to be
+    reduced to a single _space character_ ({ASCII 0x20} or equivalent).
+  + For all token types except the plain type, discard prefixes and
+    suffixes of whitespace character sequences.
+  + For the first and last text tokens in a rich text sequence, discard
+    prefixes and suffixes of whitespace character sequences respectively.
+
+ At least the following conceptual characters have to be recognized as
+ whitespace:
+
+ + Space
+ + Tab
+ + Newline (including Carriage Return)
+ + Vertical Tab
+ + Page break
+
+>
+
+
+< Element types
+
+ A *paragraph* consists of exactly one rich text sequence. It signifies a
+ self-contained piece of text.
+
+ A *listing* consists of a finite sequence of rich text sequences. It
+ signifies an ordered group of self-contained text pieces.
+
+ A *table* consists of a two-dimensional matrix of rich text sequences
+ and a single rich text sequence being its description. It signifies a
+ tabular relation of the matrix of rich text pieces.
+
+ A *plaintext* element consists of a verbatim character string and a
+ single rich text sequence being its description. It signifies a sequence
+ of characters which has to be left unchanged except for whitespace
+ prefixes and suffixes (including newlines).
+
+ A *media* element consists of an Unique Resource Identifier and a single
+ rich text sequence being its description. It signifies the embedment of
+ an external resource.
+
+ A description as mentioned above, is a piece of text elaborating the
+ contents of a given element.
+
+ A *section* consists of a Geneva document and a single rich text
+ sequence being its heading. It signifies a continuous subsequence of the
+ document, introduced by a headline (the heading).
+
+>
