@@ -11,8 +11,8 @@
   #\+ "Listing item character.")
 (defparameter *table-item*
   #\| "Table item character.")
-(defparameter *object-delimeter*
-  #\# "Object delimeter character.")
+(defparameter *object-delimiter*
+  #\# "Object delimiter character.")
 (defparameter *bold-directive*
   #\* "Bold directive character.")
 (defparameter *italic-directive*
@@ -32,7 +32,7 @@
 				     *section-end*
 				     *listing-item*
 				     *table-item*
-				     *object-delimeter*
+				     *object-delimiter*
 				     *escape-directive*)
   "Special tokens.")
 

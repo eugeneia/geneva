@@ -37,7 +37,7 @@ increase the runtime of TEST-MK2 exponentially.")
           *section-end*
           *listing-item*
           *table-item*
-          *object-delimeter*
+          *object-delimiter*
           *bold-directive*
           *italic-directive*
           *fixed-width-directive-start*

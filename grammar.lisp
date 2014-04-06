@@ -80,11 +80,11 @@
     (=result (make-listing items))))
 
 (defun =object% (keyword constructor parser)
-  (let ((delim (=token *object-delimeter*)))
-    ;; DELIM KEYWORD TEXT DELIM PARSER.
-    (=let* ((_ (=and delim (=string keyword nil)))
-            (description (=text (=or delim (=content-delimiter))))
-            (_ (=or (=and delim (=newline*))
+  (let ((delimiter (=token *object-delimiter*)))
+    ;; DELIMITER KEYWORD TEXT DELIMITER PARSER.
+    (=let* ((_ (=and delimiter (=string keyword nil)))
+            (description (=text (=or delimiter (=content-delimiter))))
+            (_ (=or (=and delimiter (=newline*))
                     ;; Description is not terminated properly
                     (=syntax-error 'malformed-object)))
             (body parser))
@@ -122,7 +122,7 @@ We even allow multiline strings with escaped newlines."
                (=syntax-error 'malformed-object))))
 
 (defun =plaintext-terminator ()
-  (=and (=skip-whitespace (=token *object-delimeter*))
+  (=and (=skip-whitespace (=token *object-delimiter*))
         (=content-delimiter)))
 
 (defun =plaintext-line ()
