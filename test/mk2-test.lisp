@@ -19,8 +19,9 @@
 (defparameter *character-range* 256
   "Range for random character values.")
 
-(defparameter *test-iterations* 4
-  "Number of test iterations.")
+(defparameter *test-iterations* 8
+  "Number of test iterations. Due to sections, this variable will
+increase the runtime of TEST-MK2 exponentially.")
 
 (defmacro one-of (&body body)
   "Evaluate a randomly chosen BODY form."
