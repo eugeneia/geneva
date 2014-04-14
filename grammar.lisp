@@ -134,7 +134,7 @@ We even allow multiline strings with escaped newlines."
   (=let* ((lines (=zero-or-more (=plaintext-line)))
           (_ (=or (=plaintext-terminator)
                   (=syntax-error 'malformed-object))))
-    (=result (format nil "~{~&~a~}" lines))))
+    (=result (format nil "~{~a~^~%~}" lines))))
 
 (defun =object ()
   (=or
