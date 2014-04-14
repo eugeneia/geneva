@@ -1,16 +1,19 @@
-;;;; Convert MK10 document to HTML document.
+;;;; Render Geneva document as HTML.
 
-(defpackage mk10.html
+(defpackage geneva.html
+  (:documentation "Render Geneva document as HTML.")
   (:use :cl
         :named-readtables
-	:mk10
+	:geneva
 	:macro-html
 	:macro-html.widgets
 	:file-types)
   (:shadow :map
            :time)
-  (:export :print-mk10-html
-           :print-mk10-html-index))
+  (:export :render-html
+           :render-index-html
+           :render-document-html
+           :render-document-html-file))
 
 (in-package :geneva.html)
 
@@ -19,14 +22,14 @@
 (defvar *header-level* 0
   "Header level.")
 
-(defvar *id-prefix* "section"
+(defparameter *id-prefix* "section"
   "Prefix for generated id strings.")
 
-(defvar *print-indexed-p* nil
-  "Switch if headers are printed indexed.")
+(defvar *render-indexed-p* nil
+  "Switch if headers are rendered indexed.")
 
-(defun print-text (text)
-  "Print TEXT in html representation."
+(defun render-text (text)
+  "Render TEXT as HTML."
   (dolist (text-part text)
     (if (stringp text-part)
 	(write-string text-part)
@@ -34,72 +37,72 @@
 	  (case (content-type text-part)
 	    (#.+bold+ (b text-part-string))
 	    (#.+italic+ (i text-part-string))
-	    (#.+code+ (code text-part-string))
+	    (#.+fixed-width+ (code text-part-string))
 	    (#.+url+ (a [:href text-part-string] text-part-string))
 	    (t (error "TEXT-PART has invalid content-type: ~S."
 		      (content-type text-part))))))))
 
-(defun print-text-lossy (text)
-  "Print TEXT without associated style information."
+(defun render-text-lossy (text)
+  "Render TEXT without associated style information."
   (dolist (text-part text)
     (if (stringp text-part)
 	(write-string text-part)
 	(write-string (content-values text-part)))))
 
-(defun print-paragraph (paragraph)
-  "Print PARAGRAPH in html representation."
-  (p (print-text (content-values paragraph))))
+(defun render-paragraph (paragraph)
+  "Render PARAGRAPH as HTML."
+  (p (render-text (content-values paragraph))))
 
-(defun print-listing (listing)
-  "Print LISTING in html representation."
+(defun render-listing (listing)
+  "Render LISTING as HTML."
   (ul (dolist (item (content-values listing))
-	(li (print-text item)))))
+	(li (render-text item)))))
 
-(defun print-object-description (description)
-  "Print DESCRIPTION for an object in html representation."
+(defun render-object-description (description)
+  "Render DESCRIPTION for an object as HTML."
   (when description
-    (figcaption (print-text description))))
+    (figcaption (render-text description))))
 
-(defun print-table (table)
-  "Print TABLE in html representation."
+(defun render-table (table)
+  "Render TABLE as HTML."
   (figure
    (multiple-value-bind (description rows)
        (content-values table)
      (table
       (thead (tr (dolist (header (first rows))
-                   (th (print-text header)))))
+                   (th (render-text header)))))
       (tbody (dolist (row (rest rows))
                (tr (dolist (column row)
-                     (td (print-text column)))))))
-     (print-object-description description))))
+                     (td (render-text column)))))))
+     (render-object-description description))))
   
-(defun print-media (media-object)
-  "Print MEDIA-OBJECT in html representation."
+(defun render-media (media-object)
+  "Render MEDIA-OBJECT as HTML."
   (figure
    (multiple-value-bind (description url)
        (content-values media-object)
      (let ((tags (file-tags url)))
        (cond ((member :image tags)
               (img :alt (with-output-to-string (*standard-output*)
-			  (print-text-lossy description))
+			  (render-text-lossy description))
 		   :src url)
-              (print-object-description description))
+              (render-object-description description))
              ((member :video tags)
               (video [:src url :controls nil])
-              (print-object-description description))
+              (render-object-description description))
              ((member :audio tags)
               (audio [:src url :controls nil])
-              (print-object-description description))
+              (render-object-description description))
              (t
-              (a [:href url] (print-text description))))))))
+              (a [:href url] (render-text description))))))))
 
-(defun print-code (code-object)
-  "Print CODE-OBJECT in html representation."
+(defun render-plaintext (plaintext-object)
+  "Render PLAINTEXT-OBJECT as HTML."
   (figure
-   (multiple-value-bind (description code)
-       (content-values code-object)
-     (pre code)
-     (print-object-description description))))
+   (multiple-value-bind (description plaintext)
+       (content-values plaintext-object)
+     (pre plaintext)
+     (render-object-description description))))
 
 (defun make-section-id-string (level)
   "Returns id string for section at LEVEL with leading *id-prefix*."
@@ -109,74 +112,79 @@
   "Print LEVEL."
   (format t "~{~a~^.~}" level))
 
-(defun print-headline (headline &optional level)
-  "Print HEADLINE in html representation possibly enumerated with LEVEL."
-  (when (and *print-indexed-p* level)
-    (span [:class "section-index"] (print-level level))
+(defun render-headline (headline &optional level)
+  "Render HEADLINE as HTML. When *RENDER-INDEXED-P* and LEVEL are not
+NIL, prefix headline with LEVEL."
+  (when (and *render-indexed-p* level)
+    (span [:class "geneva-index"] (print-level level))
     (format t " "))
-  (print-text headline))
+  (render-text headline))
 
-(defun print-header (headline level)
-  "Print header with HEADLINE in html representation."
-  (flet ((print-h ()
+(defun render-header (headline level)
+  "Render header with HEADLINE and LEVEL as HTML."
+  (flet ((render-h ()
 	   (case (+ (length level) *header-level*)
-	     (1 (h1 (print-headline headline level)))
-	     (2 (h2 (print-headline headline level)))
-	     (3 (h3 (print-headline headline level)))
-	     (4 (h4 (print-headline headline level)))
-	     (5 (h5 (print-headline headline level)))
-	     (t (h6 (print-headline headline level))))))
-    (header (a [:name (make-section-id-string level)] (print-h)))))
+	     (1 (h1 (render-headline headline level)))
+	     (2 (h2 (render-headline headline level)))
+	     (3 (h3 (render-headline headline level)))
+	     (4 (h4 (render-headline headline level)))
+	     (5 (h5 (render-headline headline level)))
+	     (t (h6 (render-headline headline level))))))
+    (header (a [:name (make-section-id-string level)] (render-h)))))
 
 (defun null-level ()
   "Returns the root level."
   (cons 1 nil))
 
 (defun descend-level (level)
-  "Returns the next deeper level."
+  "Returns the next deeper LEVEL."
   (append level (null-level)))
 
-(defun increase-level (level)
-  "Increase LEVEL by one."
+(defun incf-level (level)
+  "Increment LEVEL by one."
   (incf (elt level (length (rest level)))))
 
-(defun print-section (section level)
-  "Print SECTION in html representation."
+(defun render-section (section level)
+  "Render SECTION as HTML."
   (multiple-value-bind (description contents)
       (content-values section)
     (let ((level (or level (null-level))))
       (section
-       (print-header description level)
-       (print-contents contents (descend-level level))
-       (increase-level level)))))
+       (render-header description level)
+       (render-contents contents (descend-level level)))
+      (incf-level level))))
 
-(defun print-content (content level)
-  "Print CONTENT in html representation."
+(defun render-content (content level)
+  "Render CONTENT as HTML."
   (case (content-type content)
-    (#.+paragraph+ (print-paragraph content))
-    (#.+listing+   (print-listing content))
-    (#.+table+     (print-table content))
-    (#.+media+     (print-media content))
-    (#.+pre+       (print-code content))
-    (#.+section+   (print-section content level))
+    (#.+paragraph+ (render-paragraph content))
+    (#.+listing+   (render-listing content))
+    (#.+table+     (render-table content))
+    (#.+media+     (render-media content))
+    (#.+plaintext+ (render-plaintext content))
+    (#.+section+   (render-section content level))
     (t (error "Invalid content type in CONTENT: ~S."
 	      (content-type content)))))
 
-(defun print-contents (contents &optional (level (null-level)))
-  "Print document or section CONTENTS in html representation."
+(defun render-contents (contents &optional (level (null-level)))
+  "Render document or section CONTENTS as HTML, starting at LEVEL for
+headlines."
   (dolist (content contents)
-    (print-content content level)))
+    (render-content content level)))
 
-(defun print-mk10-html (document &key (stream *standard-output*)
-                                      (print-indexed-p t)
-                                      (id-prefix *id-prefix*)
-                                      (header-level *header-level*))
-  "Print DOCUMENT to STREAM in html representation."
+(defun render-html (document &key (stream *standard-output*)
+                                  (render-indexed-p t)
+                                  (id-prefix *id-prefix*)
+                                  (header-level *header-level*))
+  "Render DOCUMENT as HTML to STREAM. If RENDER-INDEXED-P is _true_
+headlines are prefixed with a hierarchical index. ID-PREFIX is a string
+prepended to HTML ids and defaults to {\"geneva\"}. HEADER-LEVEL controls
+the initial headline level and defauls to 0."
   (let ((*standard-output* stream)
-	(*print-indexed-p* print-indexed-p)
+	(*render-indexed-p* render-indexed-p)
         (*id-prefix* id-prefix)
 	(*header-level* header-level))
-    (print-contents document)))
+    (render-contents document)))
 
 (defun make-id-href-string (id-string)
   "Returns id href string for ID-STRING."
@@ -188,36 +196,80 @@
                (not (eq (content-type content) +section+)))
              document))
 
-(defmacro print-index-list (&body body)
-  "Convenience macro for PRINT-INDEX."
-  `(if *print-indexed-p*
+(defmacro render-index-list (&body body)
+  "Convenience macro for RENDER-INDEX."
+  `(if *render-indexed-p*
        (ol ,@body)
        (ul ,@body)))
 
-(defun print-index (sections level)
-  "Print index for SECTIONS at LEVEL in html representation."
-  (print-index-list
+(defun render-index (sections level)
+  "Render index for SECTIONS at LEVEL as HTML."
+  (render-index-list
    (dolist (section sections)
      (multiple-value-bind (description contents)
          (content-values section)
        (li (a [:href (make-id-href-string
                       (make-section-id-string level))]
-	      (print-headline description))
+	      (render-headline description))
            (let ((child-sections (document-sections contents)))
              (when child-sections
-               (print-index child-sections (descend-level level))))))
-     (increase-level level))))
-         
+               (render-index child-sections (descend-level level))))))
+     (incf-level level))))
 
-(defun print-mk10-html-index (document &key (stream *standard-output*)
-                                            (id-prefix *id-prefix*)
-                                            (print-indexed-p t))
-  "Print index for DOCUMENT to STREAM in html representation."
+(defun render-index-html (document &key (stream *standard-output*)
+                                        (render-indexed-p t)
+                                        (id-prefix *id-prefix*))
+  "Render HTML index for DOCUMENT to STREAM. If RENDER-INDEXED-P is
+_true_ headlines are prefixed with a hierarchical index. ID-PREFIX is a
+string prepended to HTML ids and defaults to {\"geneva\"}."
     (let ((*standard-output* stream)
           (*id-prefix* id-prefix)
-	  (*print-indexed-p* print-indexed-p)
+	  (*render-indexed-p* render-indexed-p)
           (level (null-level))
           (sections (document-sections document)))
       (when sections
         (nav
-         (print-index sections level)))))
+         (render-index sections level)))))
+
+(defun render-document-html (document title
+                             &key (stream *standard-output*)
+                                  author
+                                  index-caption
+                                  index-p
+                                  render-indexed-p)
+  "Render DOCUMENT as HTML to STREAM."
+  (let ((*standard-output* stream))
+    (header (when author
+              (p (em author)))
+            (h1 title))
+    (when index-p
+      (aside
+       (header (h2 index-caption))
+       (render-index-html document
+                          :render-indexed-p render-indexed-p)))
+    (article
+     (render-html document
+                  :header-level 1
+                  :render-indexed-p render-indexed-p))))
+
+(defun render-document-html-file
+    (document title
+     &key (stream *standard-output*)
+          stylesheets
+          (encoding :utf-8)
+          author
+          (index-caption "Table of Contents")
+          (index-p t)
+          (render-indexed-p t))
+  "Render DOCUMENT as HTML."
+  (let ((*standard-output* stream))
+    (html-widget-document
+     title
+     (lambda ()
+       (render-document-html document title
+                             :author author
+                             :index-caption index-caption
+                             :index-p index-p
+                             :render-indexed-p render-indexed-p))
+     :encoding encoding
+     :stylesheets stylesheets)))

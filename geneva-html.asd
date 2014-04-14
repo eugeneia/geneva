@@ -1,10 +1,5 @@
-;;;; System definition for MK10.HTML.
+;;;; System definition for GENEVA.HTML.
 
-(defpackage mk10.html-asd
-  (:use :cl :asdf))
-
-(in-package :mk10.html-asd)
-
-(defsystem mk10-html
+(defsystem geneva-html
   :components ((:file "html"))
-  :depends-on ("mk10" "macro-html" "file-types"))
+  :depends-on ("geneva" "macro-html" "file-types"))
