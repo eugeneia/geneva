@@ -1,10 +1,5 @@
-;;;; System definition for MK10.TEX.
+;;;; System definition for GENEVA.TEX.
 
-(defpackage mk10.tex-asd
-  (:use :cl :asdf))
-
-(in-package :mk10.tex-asd)
-
-(defsystem document-export-tex
+(defsystem geneva-tex
   :components ((:file "tex"))
-  :depends-on ("mk10" "texp" "named-readtables"))
+  :depends-on ("geneva" "texp" "named-readtables"))

@@ -1,25 +1,47 @@
-;;;; Export MK10 document to TeX manuscript.
+;;;; Render Geneva document as TeX manuscript.
 
-;;;; Requires these macros:
-;;;; \dbold{#1} \ditalic{#1} \dcode{#1} \durl{#1}
-;;;; \dlisting{#1} \ditem{#1}
-;;;; \dtable{#1}{#2} \dhead{#1} \drow{#1} \dcolumn{#1}
-;;;; \dgraphic{#1}{#2}
-;;;; \dverbatimstart
-;;;; \dverbatimend
-;;;; \dverbatimdescription{#1}
-;;;; \dsection{#1} \dsubsection{#1} \dsubsubsection{#1}
+;;; Expects macros as implicated below:
+;;;
+;;; Text:
+;;; \genbold{#1} \genitalic{#1} \genfixedwidth{#1} \genurl{#1}
+;;; E.g.: \genbold{...} ...
+;;;
+;;; Listing:
+;;; \genlisting{#1} \genitem{#1}
+;;; E.g.: \genlisting{\genitem{...} ...}
+;;;
+;;; Table:
+;;; \gentable{#1}{#2} \genhead{#1} \genrow{#1} \gencolumn{#1}
+;;; E.g.: \gentable{Description...}{
+;;;         \genrow{\genhead{...} ...}
+;;;         \genrow{\gencolumn{...} ...}
+;;;         ...
+;;;       }
+;;;
+;;; Figures:
+;;; \gengraphic{#1}{#2}
+;;; \genverbatimstart
+;;; \genverbatimend
+;;; \genverbatimdescription{#1}
+;;; E.g.:
+;;;  (Graphic figure)   \gengraphic{...}{<URL>}
+;;;  (Plaintext figure) \genverbatimstart ... \genverbatimend
+;;;                     \genverbatimdescription{...}
+;;;
+;;; Sections:
+;;; \gensection{#1} \gensubsection{#1} \gensubsubsection{#1}
+;;; E.g.: \gensection{...} ...
 
-(defpackage mk10.tex
+(defpackage geneva.tex
   (:documentation
-   "Export document to TeX document.")
+   "Render Geneva document as TeX manuscript.")
   (:use :cl
-	:mk10
-        :named-readtables
-	:texp)
-  (:export :print-mk10-tex))
+	:geneva
+	:texp
+        :named-readtables)
+  (:export :render-tex))
 
-(in-package :mk10.tex)
+(in-package :geneva.tex)
 
 (in-readtable texp:syntax)
 
@@ -30,12 +52,12 @@
   "Print TeX macro call for marked up TEXT-PART."
   (let ((text-part-string (escape (content-values text-part))))
     (case (content-type text-part)
-      (#.+bold+   (tex (dbold   {($ text-part-string)})))
-      (#.+italic+ (tex (ditalic {($ text-part-string)})))
-      (#.+code+   (tex (dcode   {($ text-part-string)})))
-      (#.+url+    (tex (durl    {($ text-part-string)})))
-      (otherwise  (error "TEXT-PART has invalid content-type: ~S."
-			 (content-type text-part))))))
+      (#.+bold+        (tex (genbold       {($ text-part-string)})))
+      (#.+italic+      (tex (genitalic     {($ text-part-string)})))
+      (#.+fixed-width+ (tex (genfixedwidth {($ text-part-string)})))
+      (#.+url+         (tex (genurl        {($ text-part-string)})))
+      (otherwise       (error "TEXT-PART has invalid content-type: ~S."
+                              (content-type text-part))))))
 
 (defun print-text (text)
   "Print TEXT in TeX representation."
@@ -52,58 +74,58 @@
 
 (defun print-listing (listing)
   "Print LISTING in TeX representation."
-  (tex (dlisting
+  (tex (genlisting
 	{($ (dolist (item (content-values listing))
-	      (tex (ditem {($ (print-text item))}))))})
+	      (tex (genitem {($ (print-text item))}))))})
        (br)))
 
 (defun print-table-row (row)
   "Print ROW in TeX representation."
   (dolist (column row)
-    (tex (dcolumn {($ (print-text column))}))))
+    (tex (gencolumn {($ (print-text column))}))))
 
 (defun print-table-headrow (headrow)
   "Print HEADROW in TeX representation."
   (dolist (column headrow)
-    (tex (dhead {($ (print-text column))}))))
+    (tex (genhead {($ (print-text column))}))))
 
 (defun print-table (table)
   "Print TABLE in TeX representation."
   (multiple-value-bind (description rows)
       (content-values table)
-    (tex (dtable
+    (tex (gentable
 	  {($ (print-text description))}
-	  {(drow {($ (print-table-headrow (first rows)))})
+	  {(genrow {($ (print-table-headrow (first rows)))})
 	   ($ (dolist (row (rest rows))
-		(tex (drow {($ (print-table-row row))}))))})
+		(tex (genrow {($ (print-table-row row))}))))})
 	 (br))))
 
 (defun print-media (media-object)
   "Print MEDIA in TeX representation (can only be 2D graphics)."
   (multiple-value-bind (description url)
       (content-values media-object)
-    (tex (dgraphic {($ (print-text description))}
+    (tex (gengraphic {($ (print-text description))}
 		   {($ (escape url))})
 	 (br))))
 
-(defun print-code (code-object)
-  "Print CODE-OBJECT in TeX representation."
+(defun print-plaintext (plaintext-object)
+  "Print PLAINTEXT-OBJECT in TeX representation."
   (multiple-value-bind (description text)
-      (content-values code-object)
-    (tex (dverbatimstart)
+      (content-values plaintext-object)
+    (tex (genverbatimstart)
 	 ($ (fresh-line))
-	 ($ text)
-	 ($ (fresh-line))
-	 (dverbatimend)
-	 (dverbatimdescription {($ (print-text description))})
+	 ($ (escape text))
+         ($ (fresh-line))
+	 (genverbatimend)
+	 (genverbatimdescription {($ (print-text description))})
 	 (br))))
 
 (defun print-header (header)
   "Print HEADER in TeX representation."
   (case *section-level*
-    (0 (tex (dsection {($ (print-text header))})))
-    (1 (tex (dsubsection {($ (print-text header))})))
-    (otherwise (tex (dsubsubsection {($ (print-text header))}))))
+    (0 (tex (gensection {($ (print-text header))})))
+    (1 (tex (gensubsection {($ (print-text header))})))
+    (otherwise (tex (gensubsubsection {($ (print-text header))}))))
   (tex (br)))
 
 (defun print-section (section)
@@ -122,7 +144,7 @@
     (#.+listing+   (print-listing content))
     (#.+table+     (print-table content))
     (#.+media+     (print-media content))
-    (#.+pre+       (print-code content))
+    (#.+plaintext+ (print-plaintext content))
     (#.+section+   (print-section content))
     (t (error "Invalid content type in CONTENT: ~S."
 	      (content-type content)))))
@@ -131,9 +153,9 @@
   "Print document or section CONTENTS in TeX representation."
   (dolist (content contents) (print-content content)))
 
-(defun print-mk10-tex (document &key (stream *standard-output*)
-                                     (section-level *section-level*))
-  "Print MK10 DOCUMENT to STREAM as a TeX manuscript."
+(defun render-tex (document &optional (stream *standard-output*)
+                            &key      (section-level *section-level*))
+  "Render Geneva DOCUMENT as TeX manuscript to STREAM."
   (let ((*standard-output* stream)
 	(*section-level* section-level))
     (print-contents document)))
