@@ -5,7 +5,7 @@
         :mpc
         :geneva
         :geneva.mk2
-        :mk2.tokens)
+        :geneva.mk2.tokens)
   (:export :random-paragraph
            :random-listing
            :random-table

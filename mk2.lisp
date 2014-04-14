@@ -1,6 +1,6 @@
 ;;;; Packages for the MK2 markup language.
 
-(defpackage mk2.tokens
+(defpackage geneva.mk2.tokens
   (:documentation "Tokens used by the MK2 markup language.")
   (:use :cl)
   (:export :*section-start*
@@ -26,7 +26,7 @@
    "Read and print Geneva documents using the MK2 markup language..")
   (:use :cl
         :geneva
-        :mk2.tokens
+        :geneva.mk2.tokens
         :mpc
         :mpc.characters
         :pretty-string

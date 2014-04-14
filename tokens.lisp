@@ -1,6 +1,6 @@
 ;;;; Tokens used in MK10 document syntax.
 
-(in-package :mk2.tokens)
+(in-package :geneva.mk2.tokens)
 
 ;;; Syntax tokens
 (defparameter *section-start*
