@@ -1,8 +1,9 @@
 ;;;; Packages for Geneva.
 
 (defpackage geneva
-  (:documentation "Geneva core package. Exports functions to
-programatically create and traverse Geneva document..")
+  (:documentation
+   "Geneva core package. Exports functions to programatically create and
+traverse Geneva document.")
   (:use :cl
         :split-sequence)
   (:export :+paragraph+
