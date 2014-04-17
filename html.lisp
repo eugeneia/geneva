@@ -25,7 +25,7 @@
 (defparameter *id-prefix* "section"
   "Prefix for generated id strings.")
 
-(defvar *render-indexed-p* nil
+(defvar *index-headers-p* nil
   "Switch if headers are rendered indexed.")
 
 (defun render-text (text)
@@ -113,9 +113,9 @@
   (format t "~{~a~^.~}" level))
 
 (defun render-headline (headline &optional level)
-  "Render HEADLINE as HTML. When *RENDER-INDEXED-P* and LEVEL are not
-NIL, prefix headline with LEVEL."
-  (when (and *render-indexed-p* level)
+  "Render HEADLINE as HTML. When *INDEX-HEADERS-P* and LEVEL are not NIL,
+prefix headline with LEVEL."
+  (when (and *index-headers-p* level)
     (span [:class "geneva-index"] (print-level level))
     (format t " "))
   (render-text headline))
@@ -173,15 +173,15 @@ headlines."
     (render-content content level)))
 
 (defun render-html (document &key (stream *standard-output*)
-                                  (render-indexed-p t)
+                                  (index-headers-p t)
                                   (id-prefix *id-prefix*)
                                   (header-level *header-level*))
-  "Render DOCUMENT as HTML to STREAM. If RENDER-INDEXED-P is _true_
+  "Render DOCUMENT as HTML to STREAM. If INDEX-HEADERS-P is _true_
 headlines are prefixed with a hierarchical index. ID-PREFIX is a string
 prepended to HTML ids and defaults to {\"geneva\"}. HEADER-LEVEL controls
 the initial headline level and defauls to 0."
   (let ((*standard-output* stream)
-	(*render-indexed-p* render-indexed-p)
+	(*index-headers-p* index-headers-p)
         (*id-prefix* id-prefix)
 	(*header-level* header-level))
     (render-contents document)))
@@ -198,7 +198,7 @@ the initial headline level and defauls to 0."
 
 (defmacro render-index-list (&body body)
   "Convenience macro for RENDER-INDEX."
-  `(if *render-indexed-p*
+  `(if *index-headers-p*
        (ol ,@body)
        (ul ,@body)))
 
@@ -217,14 +217,14 @@ the initial headline level and defauls to 0."
      (incf-level level))))
 
 (defun render-index-html (document &key (stream *standard-output*)
-                                        (render-indexed-p t)
+                                        (index-headers-p t)
                                         (id-prefix *id-prefix*))
-  "Render HTML index for DOCUMENT to STREAM. If RENDER-INDEXED-P is
-_true_ headlines are prefixed with a hierarchical index. ID-PREFIX is a
-string prepended to HTML ids and defaults to {\"geneva\"}."
+  "Render HTML index for DOCUMENT to STREAM. If INDEX-HEADERS-P is _true_
+headlines are prefixed with a hierarchical index. ID-PREFIX is a string
+prepended to HTML ids and defaults to {\"geneva\"}."
     (let ((*standard-output* stream)
           (*id-prefix* id-prefix)
-	  (*render-indexed-p* render-indexed-p)
+	  (*index-headers-p* index-headers-p)
           (level (null-level))
           (sections (document-sections document)))
       (when sections
@@ -236,7 +236,7 @@ string prepended to HTML ids and defaults to {\"geneva\"}."
                                   author
                                   index-caption
                                   index-p
-                                  render-indexed-p)
+                                  index-headers-p)
   "Render DOCUMENT as HTML to STREAM."
   (let ((*standard-output* stream))
     (header (when author
@@ -246,11 +246,11 @@ string prepended to HTML ids and defaults to {\"geneva\"}."
       (aside
        (header (h2 index-caption))
        (render-index-html document
-                          :render-indexed-p render-indexed-p)))
+                          :index-headers-p index-headers-p)))
     (article
      (render-html document
                   :header-level 1
-                  :render-indexed-p render-indexed-p))))
+                  :index-headers-p index-headers-p))))
 
 (defun render-document-html-file
     (document title
@@ -260,7 +260,7 @@ string prepended to HTML ids and defaults to {\"geneva\"}."
           author
           (index-caption "Table of Contents")
           (index-p t)
-          (render-indexed-p t))
+          index-headers-p)
   "Render DOCUMENT as HTML."
   (let ((*standard-output* stream))
     (html-widget-document
@@ -270,6 +270,6 @@ string prepended to HTML ids and defaults to {\"geneva\"}."
                              :author author
                              :index-caption index-caption
                              :index-p index-p
-                             :render-indexed-p render-indexed-p))
+                             :index-headers-p index-headers-p))
      :encoding encoding
      :stylesheets stylesheets)))
