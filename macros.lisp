@@ -35,4 +35,4 @@ lists) of text."
 
 (defmacro document (&rest content)
   "Make document with CONTENT."
-  `(list ,@content))
+  `(make-document (list ,@content)))
