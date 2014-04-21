@@ -6,6 +6,9 @@
 ;;; \genbold{#1} \genitalic{#1} \genfixedwidth{#1} \genurl{#1}
 ;;; E.g.: \genbold{...} ...
 ;;;
+;;; \gentinyparagraph{#1} (For very short paragraphs)
+;;;; E.g. \gentinyparagraph{...} 
+;;;
 ;;; Listing:
 ;;; \genlisting{#1} \genitem{#1}
 ;;; E.g.: \genlisting{\genitem{...} ...}
@@ -67,10 +70,20 @@
 	(print-text-markup text-part)))
   (values))
 
+(defun tiny-paragraph-p (paragraph)
+  "If PARAGRAPH contains less than 60 characters its a _tiny paragraph_."
+  (< (loop for token in (content-values paragraph)
+        if (stringp token) sum (length token)
+        else sum (length (content-values token)))
+     60))
+
 (defun print-paragraph (paragraph)
   "Print PARAGRAPH in TeX representation."
-  (print-text (content-values paragraph))
-  (tex (br)))
+  (if (tiny-paragraph-p paragraph)
+      (tex (gentinyparagraph
+            {($ (print-text (content-values paragraph)))}))
+      (tex ($ (print-text (content-values paragraph)))
+           (br))))
 
 (defun print-listing (listing)
   "Print LISTING in TeX representation."
@@ -105,7 +118,7 @@
   (multiple-value-bind (description url)
       (content-values media-object)
     (tex (gengraphic {($ (print-text description))}
-		   {($ (escape url))})
+                     {($ (escape url))})
 	 (br))))
 
 (defun print-plaintext (plaintext-object)

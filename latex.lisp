@@ -18,7 +18,15 @@
   (deftex genbold       (text) (textbf {($ text)}))
   (deftex genitalic     (text) (textit {($ text)}))
   (deftex genfixedwidth (text) (texttt {($ text)}))
-  (deftex genurl        (text) (underline  {($ text)})))
+  (deftex genurl        (text) (underline  {($ text)}))
+
+  (deftex gentinyparagraph (text)
+    (smallskip)
+    (br)
+    (noindent)
+    ($ text)
+    (br)
+    (smallskip)))
 
 (defun latex-listing ()
   "Listing implementation for LaTeX."
