@@ -98,14 +98,3 @@ lists) of text."
 (defun content-values (content)
   "Returns CONTENT's values."
   (apply #'values (rest content)))
-
-(defun section-content (section)
-  "Returns SECTION's content."
-  (third section))
-
-(defun walk-document (document function)
-  "Walk over DOCUMENT and call (FUNCTION content) on content."
-  (dolist (content document)
-    (funcall function content)
-    (when (eq (content-type content) +section+)
-      (walk-document (section-content content) function))))

@@ -28,8 +28,7 @@ traverse Geneva document.")
 	   :make-url
            :make-document
 	   :content-type
-	   :content-values
-	   :walk-document))
+	   :content-values))
 
 (defpackage geneva.macros
   (:documentation "Reader macros to ease creating Geneva documents.")

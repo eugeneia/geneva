@@ -1,8 +1,9 @@
 ;;;; System definition for the Geneva document preparation system.
 
 (defsystem geneva
-  :description "Core of the Geneva document preparation system. Provides
-  data structures and syntax sugar."
+  :description
+  "Core of the Geneva document preparation system. Provides data
+  structures and syntax sugar."
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
   :components ((:file "geneva")
@@ -15,5 +16,7 @@
 	       (:file "syntax"
                       :depends-on ("geneva"
                                    "struct"
-                                   "macros")))
+                                   "macros"))
+               (:file "utilities"
+                      :depends-on ("geneva" "struct")))
   :depends-on ("split-sequence" "named-readtables"))
