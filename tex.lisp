@@ -166,8 +166,8 @@
   "Print document or section CONTENTS in TeX representation."
   (dolist (content contents) (print-content content)))
 
-(defun render-tex (document &optional (stream *standard-output*)
-                            &key      (section-level *section-level*))
+(defun render-tex (document &key (stream *standard-output*)
+                                 (section-level *section-level*))
   "Render Geneva DOCUMENT as TeX manuscript to STREAM."
   (let ((*standard-output* stream)
 	(*section-level* section-level))

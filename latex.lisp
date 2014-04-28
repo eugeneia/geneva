@@ -6,12 +6,16 @@
   (:use :cl
 	:named-readtables
 	:texp
-	:geneva.tex)
+	:geneva.tex
+        :geneva.utilities)
   (:export :render-latex))
 
 (in-package :geneva.latex)
 
 (in-readtable texp:syntax)
+
+(defparameter *index-headers-p* t
+  "Controls wether headers are numbered.")
 
 (defun latex-text ()
   "Text formatting implementation for LaTeX."
@@ -21,12 +25,12 @@
   (deftex genurl        (text) (underline  {($ text)}))
 
   (deftex gentinyparagraph (text)
-    (smallskip)
+    (medskip)
     (br)
     (noindent)
     ($ text)
     (br)
-    (smallskip)))
+    (medskip)))
 
 (defun latex-listing ()
   "Listing implementation for LaTeX."
@@ -80,9 +84,21 @@
 
 (defun latex-sections ()
   "Sections implementation for LaTeX."
-  (deftex gensection       (header) (section {($ header)}))
-  (deftex gensubsection    (header) (subsection {($ header)}))
-  (deftex gensubsubsection (header) (subsubsection {($ header)})))
+  (if *index-headers-p*
+      (progn
+        (deftex gensection (header)
+          (section {($ header)}))
+        (deftex gensubsection (header)
+          (subsection {($ header)}))
+        (deftex gensubsubsection (header)
+          (subsubsection {($ header)})))
+      (progn
+        (deftex gensection (header)
+          (section* {($ header)}))
+        (deftex gensubsection (header)
+          (subsection* {($ header)}))
+        (deftex gensubsubsection (header)
+          (subsubsection* {($ header)})))))
 
 (defun document-implementation ()
   "Implementation of the document primitives for LaTeX."
@@ -100,35 +116,37 @@
        (usepackage {graphicx})
        (usepackage {alltt})))
 
-(defun render-latex (document title
-                     &optional (stream *standard-output*)
-                     &key (preamble #'default-preamble)
-                          appendix
+(defun render-latex (document
+                     &key (stream *standard-output*)
+                          title
+                          author
                           (date :today)
-		          author
-		          (title-p t)
-		          (index-caption "Table of Contents")
-		          (index-p t))
+                          (index-p t)
+                          (index-caption *default-index-caption*)
+                          (index-headers-p *index-headers-p*)
+                          (preamble #'default-preamble)
+                          appendix)
   "Render Geneva document as LaTeX manuscript."
-  (let ((*standard-output* stream))
+  (let ((*standard-output* stream)
+        (*index-headers-p* index-headers-p))
     (document-implementation)
     (when preamble (funcall preamble))
     (tex (br)
          (begin {document})
-         (pagenumbering {roman})
-         (title {($ title)}))
+         (pagenumbering {roman}))
+    (when title (tex (title {($ title)})))
     (when author (tex (author {($ author)})))
     (cond ((eq date :today) (tex (date {(today)})))
           ((stringp date) (tex (date {($ date)})))
           ((not date) (tex (date {}))))
-    (when title-p (tex (maketitle)))
+    (when title (tex (maketitle)))
     (when index-p (tex (renewcommand {(contentsname)}
                                      {($ index-caption)})
                        (tableofcontents)
-                       (newpage)
-                       (pagenumbering {arabic})
-                       (setcounter {page} {1})))
-    (tex (br))
+                       (newpage)))
+    (tex (pagenumbering {arabic})
+         (setcounter {page} {1})
+         (br))
     (render-tex document)
     (when appendix (funcall appendix))
     (tex (end {document}))))

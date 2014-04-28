@@ -3,30 +3,29 @@
 (defpackage geneva.html
   (:documentation "Render Geneva document as HTML.")
   (:use :cl
-        :named-readtables
 	:geneva
+        :geneva.utilities
 	:macro-html
 	:macro-html.widgets
+        :named-readtables
 	:file-types)
   (:shadow :map
            :time)
   (:export :render-html
-           :render-index-html
-           :render-document-html
-           :render-document-html-file))
+           :render-html-file))
 
 (in-package :geneva.html)
 
 (in-readtable macro-html:syntax)
-
-(defvar *header-level* 0
-  "Header level.")
 
 (defparameter *id-prefix* "section"
   "Prefix for generated id strings.")
 
 (defvar *index-headers-p* nil
   "Switch if headers are rendered indexed.")
+
+(defvar *header-level* 0
+  "Header level.")
 
 (defun render-text (text)
   "Render TEXT as HTML."
@@ -41,13 +40,6 @@
 	    (#.+url+ (a [:href text-part-string] text-part-string))
 	    (t (error "TEXT-PART has invalid content-type: ~S."
 		      (content-type text-part))))))))
-
-(defun render-text-lossy (text)
-  "Render TEXT without associated style information."
-  (dolist (text-part text)
-    (if (stringp text-part)
-	(write-string text-part)
-	(write-string (content-values text-part)))))
 
 (defun render-paragraph (paragraph)
   "Render PARAGRAPH as HTML."
@@ -83,9 +75,7 @@
        (content-values media-object)
      (let ((tags (file-tags url)))
        (cond ((member :image tags)
-              (img :alt (with-output-to-string (*standard-output*)
-			  (render-text-lossy description))
-		   :src url)
+              (img :alt (text-string description) :src url)
               (render-object-description description))
              ((member :video tags)
               (video [:src url :controls nil])
@@ -108,15 +98,11 @@
   "Returns id string for section at LEVEL with leading *id-prefix*."
   (format nil "~a-~{~a~^-~}" *id-prefix* level))
 
-(defun print-level (level)
-  "Print LEVEL."
-  (format t "~{~a~^.~}" level))
-
 (defun render-headline (headline &optional level)
   "Render HEADLINE as HTML. When *INDEX-HEADERS-P* and LEVEL are not NIL,
 prefix headline with LEVEL."
   (when (and *index-headers-p* level)
-    (span [:class "geneva-index"] (print-level level))
+    (span [:class "geneva-index"] (level-string level))
     (format t " "))
   (render-text headline))
 
@@ -131,18 +117,6 @@ prefix headline with LEVEL."
 	     (5 (h5 (render-headline headline level)))
 	     (t (h6 (render-headline headline level))))))
     (header (a [:name (make-section-id-string level)] (render-h)))))
-
-(defun null-level ()
-  "Returns the root level."
-  (cons 1 nil))
-
-(defun descend-level (level)
-  "Returns the next deeper LEVEL."
-  (append level (null-level)))
-
-(defun incf-level (level)
-  "Increment LEVEL by one."
-  (incf (elt level (length (rest level)))))
 
 (defun render-section (section level)
   "Render SECTION as HTML."
@@ -172,8 +146,35 @@ headlines."
   (dolist (content contents)
     (render-content content level)))
 
+(defun make-id-href-string (id-string)
+  "Returns id href string for ID-STRING."
+  (concatenate 'string "#" id-string))
+
+(defmacro render-index-list (&body body)
+  "Convenience macro for RENDER-INDEX."
+  `(if *index-headers-p*
+       (ol ,@body)
+       (ul ,@body)))
+
+(defun render-index (index)
+  "Render INDEX as HTML."
+  (render-index-list
+   (dolist (section index)
+     (destructuring-bind (level title subsections)
+         section
+       (li (a [:href (make-id-href-string
+                      (make-section-id-string level))]
+              (render-headline title))
+           (when subsections
+             (render-index subsections)))))))
+
 (defun render-html (document &key (stream *standard-output*)
-                                  (index-headers-p t)
+                                  title
+                                  author
+                                  date
+                                  index-p
+                                  (index-caption *default-index-caption*)
+                                  (index-headers-p *index-headers-p*)
                                   (id-prefix *id-prefix*)
                                   (header-level *header-level*))
   "Render DOCUMENT as HTML to STREAM. If INDEX-HEADERS-P is _true_
@@ -184,92 +185,44 @@ the initial headline level and defauls to 0."
 	(*index-headers-p* index-headers-p)
         (*id-prefix* id-prefix)
 	(*header-level* header-level))
+    (when (or title author date)
+      (header (when title
+                (h1 title))
+              (when author
+                (p author))
+              (when date
+                (p date))))
+    (when index-p
+      (let ((index (document-index document)))
+        (when index 
+          (aside
+           (header (b index-caption))
+           (nav (render-index index))))))
     (render-contents document)))
 
-(defun make-id-href-string (id-string)
-  "Returns id href string for ID-STRING."
-  (concatenate 'string "#" id-string))
-
-(defun document-sections (document)
-  "Returns list of sections in DOCUMENT."
-  (remove-if (lambda (content)
-               (not (eq (content-type content) +section+)))
-             document))
-
-(defmacro render-index-list (&body body)
-  "Convenience macro for RENDER-INDEX."
-  `(if *index-headers-p*
-       (ol ,@body)
-       (ul ,@body)))
-
-(defun render-index (sections level)
-  "Render index for SECTIONS at LEVEL as HTML."
-  (render-index-list
-   (dolist (section sections)
-     (multiple-value-bind (description contents)
-         (content-values section)
-       (li (a [:href (make-id-href-string
-                      (make-section-id-string level))]
-	      (render-headline description))
-           (let ((child-sections (document-sections contents)))
-             (when child-sections
-               (render-index child-sections (descend-level level))))))
-     (incf-level level))))
-
-(defun render-index-html (document &key (stream *standard-output*)
-                                        (index-headers-p t)
-                                        (id-prefix *id-prefix*))
-  "Render HTML index for DOCUMENT to STREAM. If INDEX-HEADERS-P is _true_
-headlines are prefixed with a hierarchical index. ID-PREFIX is a string
-prepended to HTML ids and defaults to {\"geneva\"}."
-    (let ((*standard-output* stream)
-          (*id-prefix* id-prefix)
-	  (*index-headers-p* index-headers-p)
-          (level (null-level))
-          (sections (document-sections document)))
-      (when sections
-        (nav
-         (render-index sections level)))))
-
-(defun render-document-html (document title
-                             &key (stream *standard-output*)
-                                  author
-                                  index-caption
-                                  index-p
-                                  index-headers-p)
-  "Render DOCUMENT as HTML to STREAM."
-  (let ((*standard-output* stream))
-    (header (when author
-              (p (em author)))
-            (h1 title))
-    (when index-p
-      (aside
-       (header (h2 index-caption))
-       (render-index-html document
-                          :index-headers-p index-headers-p)))
-    (article
-     (render-html document
-                  :header-level 1
-                  :index-headers-p index-headers-p))))
-
-(defun render-document-html-file
-    (document title
-     &key (stream *standard-output*)
-          stylesheets
-          (encoding :utf-8)
-          author
-          (index-caption "Table of Contents")
-          (index-p t)
-          index-headers-p)
-  "Render DOCUMENT as HTML."
+(defun render-html-file (document
+                         &key (stream *standard-output*)
+                              (title *default-title*)
+                              author
+                              date
+                              index-p
+                              (index-caption *default-index-caption*)
+                              (index-headers-p *index-headers-p*)
+                              (id-prefix *id-prefix*)
+                              stylesheets
+                              (encoding :utf-8))
+  "Render DOCUMENT as stand-alone HTML file."
   (let ((*standard-output* stream))
     (html-widget-document
      title
      (lambda ()
-       (render-document-html document title
-                             :author author
-                             :index-caption index-caption
-                             :index-p index-p
-                             :index-headers-p index-headers-p))
+       (render-html document
+                    :title title
+                    :author author
+                    :date date
+                    :index-p index-p
+                    :index-caption index-caption
+                    :index-headers-p index-headers-p
+                    :id-prefix id-prefix))
      :encoding encoding
      :stylesheets stylesheets)))
