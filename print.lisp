@@ -71,11 +71,18 @@
                         (escape item)
                         (markup-string item))))))
 
-(defun listing-string (items)
-  "Return listing string for ITEMS."
+(defun listing-string (items &optional (bullet "+ "))
+  "Return listing string for ITEMS using BULLET."
   (with-output-to-string (*standard-output*)
     (dolist (item items)
-      (format t "+ ~a~%" (text-string item)))))
+      (format t "~a~a"
+              bullet
+              (let* ((*indent* (length bullet))
+                     (*columns* (- *columns* *indent*)))
+                (subseq
+                 (with-output-to-string (*standard-output*)
+                   (print-string (text-string item)))
+                 *indent*))))))
 
 (defun caption-string (type-string caption)
   "Return caption string for TYPE-STRING and CAPTION."
@@ -83,8 +90,8 @@
           (string-downcase type-string)
           (when caption (text-string caption))))
 
-(defun table-string (rows)
-  "Return string for ROWS."
+(defun table-string (rows &optional (delimiter "| "))
+  "Return string for ROWS using DELIMITER."
   (flet ((widths (rows)
            (let ((widths nil))
              (dotimes (x (length (first rows)) (reverse widths))
@@ -102,7 +109,7 @@
 	  (loop for item in row
 	        for width in table-widths
 	     do
-               (format t "| ~a" item)
+               (format t "~a~a" delimiter item)
 	       (print-spaces (- (+ width *table-padding*)
 				(length item))))
 	  (terpri))))))
@@ -131,7 +138,8 @@
                    (terpri))
 
     (#.+listing+   (print-string
-                    (listing-string (content-values content))))
+                    (listing-string (content-values content))
+                    :wrap nil))
 
     (#.+table+     (multiple-value-bind (caption rows)
                        (content-values content)
