@@ -51,8 +51,8 @@
 (defvar *section-level* 0
   "Section level.")
 
-(defun print-text-markup (text-part)
-  "Print TeX macro call for marked up TEXT-PART."
+(defun render-text-markup (text-part)
+  "Render TeX macro call for marked up TEXT-PART."
   (let ((text-part-string (escape (content-values text-part))))
     (case (content-type text-part)
       (#.+bold+        (tex (genbold       {($ text-part-string)})))
@@ -62,12 +62,12 @@
       (otherwise       (error "TEXT-PART has invalid content-type: ~S."
                               (content-type text-part))))))
 
-(defun print-text (text)
-  "Print TEXT in TeX representation."
+(defun render-text (text)
+  "Render TEXT in TeX representation."
   (dolist (text-part text)
     (if (stringp text-part)
 	(write-string (escape text-part))
-	(print-text-markup text-part)))
+	(render-text-markup text-part)))
   (values))
 
 (defun tiny-paragraph-p (paragraph)
@@ -77,52 +77,52 @@
         else sum (length (content-values token)))
      60))
 
-(defun print-paragraph (paragraph)
-  "Print PARAGRAPH in TeX representation."
+(defun render-paragraph (paragraph)
+  "Render PARAGRAPH in TeX representation."
   (if (tiny-paragraph-p paragraph)
       (tex (gentinyparagraph
-            {($ (print-text (content-values paragraph)))}))
-      (tex ($ (print-text (content-values paragraph)))
+            {($ (render-text (content-values paragraph)))}))
+      (tex ($ (render-text (content-values paragraph)))
            (br))))
 
-(defun print-listing (listing)
-  "Print LISTING in TeX representation."
+(defun render-listing (listing)
+  "Render LISTING in TeX representation."
   (tex (genlisting
 	{($ (dolist (item (content-values listing))
-	      (tex (genitem {($ (print-text item))}))))})
+	      (tex (genitem {($ (render-text item))}))))})
        (br)))
 
-(defun print-table-row (row)
-  "Print ROW in TeX representation."
+(defun render-table-row (row)
+  "Render ROW in TeX representation."
   (dolist (column row)
-    (tex (gencolumn {($ (print-text column))}))))
+    (tex (gencolumn {($ (render-text column))}))))
 
-(defun print-table-headrow (headrow)
-  "Print HEADROW in TeX representation."
+(defun render-table-headrow (headrow)
+  "Render HEADROW in TeX representation."
   (dolist (column headrow)
-    (tex (genhead {($ (print-text column))}))))
+    (tex (genhead {($ (render-text column))}))))
 
-(defun print-table (table)
-  "Print TABLE in TeX representation."
+(defun render-table (table)
+  "Render TABLE in TeX representation."
   (multiple-value-bind (description rows)
       (content-values table)
     (tex (gentable
-	  {($ (print-text description))}
-	  {(genrow {($ (print-table-headrow (first rows)))})
+	  {($ (render-text description))}
+	  {(genrow {($ (render-table-headrow (first rows)))})
 	   ($ (dolist (row (rest rows))
-		(tex (genrow {($ (print-table-row row))}))))})
+		(tex (genrow {($ (render-table-row row))}))))})
 	 (br))))
 
-(defun print-media (media-object)
-  "Print MEDIA in TeX representation (can only be 2D graphics)."
+(defun render-media (media-object)
+  "Render MEDIA in TeX representation (can only be 2D graphics)."
   (multiple-value-bind (description url)
       (content-values media-object)
-    (tex (gengraphic {($ (print-text description))}
+    (tex (gengraphic {($ (render-text description))}
                      {($ (escape url))})
 	 (br))))
 
-(defun print-plaintext (plaintext-object)
-  "Print PLAINTEXT-OBJECT in TeX representation."
+(defun render-plaintext (plaintext-object)
+  "Render PLAINTEXT-OBJECT in TeX representation."
   (multiple-value-bind (description text)
       (content-values plaintext-object)
     (tex (genverbatimstart)
@@ -130,45 +130,45 @@
 	 ($ (escape text))
          ($ (fresh-line))
 	 (genverbatimend)
-	 (genverbatimdescription {($ (print-text description))})
+	 (genverbatimdescription {($ (render-text description))})
 	 (br))))
 
-(defun print-header (header)
-  "Print HEADER in TeX representation."
+(defun render-header (header)
+  "Render HEADER in TeX representation."
   (case *section-level*
-    (0 (tex (gensection {($ (print-text header))})))
-    (1 (tex (gensubsection {($ (print-text header))})))
-    (otherwise (tex (gensubsubsection {($ (print-text header))}))))
+    (0 (tex (gensection {($ (render-text header))})))
+    (1 (tex (gensubsection {($ (render-text header))})))
+    (otherwise (tex (gensubsubsection {($ (render-text header))}))))
   (tex (br)))
 
-(defun print-section (section)
-  "Print SECTION in TeX representation."
+(defun render-section (section)
+  "Render SECTION in TeX representation."
   (multiple-value-bind (header contents)
       (content-values section)
-    (print-header header)
+    (render-header header)
     (let ((*section-level* (1+ *section-level*)))
-      (print-contents contents))
+      (render-contents contents))
     (tex (br))))
 
-(defun print-content (content)
-  "Print CONTENT in html representation."
+(defun render-content (content)
+  "Render CONTENT in html representation."
   (case (content-type content)
-    (#.+paragraph+ (print-paragraph content))
-    (#.+listing+   (print-listing content))
-    (#.+table+     (print-table content))
-    (#.+media+     (print-media content))
-    (#.+plaintext+ (print-plaintext content))
-    (#.+section+   (print-section content))
+    (#.+paragraph+ (render-paragraph content))
+    (#.+listing+   (render-listing content))
+    (#.+table+     (render-table content))
+    (#.+media+     (render-media content))
+    (#.+plaintext+ (render-plaintext content))
+    (#.+section+   (render-section content))
     (t (error "Invalid content type in CONTENT: ~S."
 	      (content-type content)))))
 
-(defun print-contents (contents)
-  "Print document or section CONTENTS in TeX representation."
-  (dolist (content contents) (print-content content)))
+(defun render-contents (contents)
+  "Render document or section CONTENTS in TeX representation."
+  (dolist (content contents) (render-content content)))
 
 (defun render-tex (document &key (stream *standard-output*)
                                  (section-level *section-level*))
   "Render Geneva DOCUMENT as TeX manuscript to STREAM."
   (let ((*standard-output* stream)
 	(*section-level* section-level))
-    (print-contents document)))
+    (render-contents document)))
