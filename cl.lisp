@@ -9,8 +9,7 @@
 	:geneva
         :geneva.mk2
         :geneva.macros
-        :trivial-documentation
-	:cl-ppcre)
+        :trivial-documentation)
   (:export :api-document))
 
 (in-package :geneva.common-lisp)
@@ -25,76 +24,6 @@
                 string-or-symbol
                 (string-downcase string-or-symbol)))))
 
-(defparameter *non-symbol-characters*
-  '(:whitespace-char-class
-    #\( #\) #\' #\# #\` #\, #\; #\")
-  "Non-symbol characters.")
-
-(defparameter *manual-markup-characters*
-  '(#\{ #\} #\[ #\] #\_)
-  "Characters used for symbol indication by document markup.")
-
-(defparameter *lower-case-characters*
-  '((:property "LowercaseLetter"))
-  "Lower case characters.")
-
-(defparameter *other-grammar-tokens*
-  '(#\, #\: #\; #\. #\! #\?)
-  "Grammar tokens commonly used in sentences.")
-
-(defparameter *most-symbols-regex*
-  (create-scanner `(:alternation
-                    ;; A string already wrapped in braces.
-		    (:sequence ,(first *manual-markup-characters*)
-			       (:greedy-repetition
-                                0 nil
-                                (:inverted-char-class
-                                 ,(second *manual-markup-characters*)))
-                               ,(second *manual-markup-characters*))
-                    ;; A SYMBOL to be marked up (at least two uppercase
-                    ;; symbol characters).
-		    (:sequence
-		     (:greedy-repetition
-		      2 nil
-		      (:inverted-char-class
-		       ,@(append *non-symbol-characters*
-				 *manual-markup-characters*
-				 *lower-case-characters*)))
-		     (:positive-lookahead
-		      (:alternation ,@*other-grammar-tokens*
-                                    ,@*non-symbol-characters*
-                                    :end-anchor)))))
-  "Regular expression to match most symbols or already marked up
-strings.")
-
-(defun most-symbols-replace (target-string start end
-			     match-start match-end
-			     reg-starts reg-ends)
-  "Replace most symbols with markup but skip already marked up stings."
-  (declare (ignore start end reg-starts reg-ends))
-  (cond
-    ;; TARGET-STRING is already marked up, return unchanged.
-    ((char= (aref target-string match-start)
-            (first *manual-markup-characters*))
-     (subseq target-string match-start match-end))
-    ;; TARGET-STRING ends in a character of *OTHER-GRAMMAR-TOKENS*, wrap
-    ;; everything but the last character in braces.
-    ((member (aref target-string (1- match-end)) *other-grammar-tokens*)
-     (format nil "_~a_~c"
-             (name* (subseq target-string match-start (1- match-end)))
-             (aref target-string (1- match-end))))
-    ;; Otherwise wrap TARGET-STRING in braces.
-    (t (format nil "_~a_"
-               (name* (subseq target-string match-start match-end))))))
-
-;;; Markup here means mk2's italic font markup (_..._)
-(defun markup-most-symbols (documentation-string)
-  "Markup most symbols in DOCUMENTATION-STRING using
-*MOST-SYMBOLS-REGEX*"
-  (regex-replace-all *most-symbols-regex*
-		     documentation-string
-		     #'most-symbols-replace))
-
 (defun definition-template (kind-string name &optional text)
   "Template for common definition formatting."
   (document
@@ -105,7 +34,7 @@ strings.")
   "Compile document from DOCSTRING."
   (when docstring
     (list* (paragraph "Description:")
-           (read-mk2 (markup-most-symbols docstring)))))
+           (read-mk2 docstring))))
 
 (defun value-string (value)
   "Return pretty string for VALUE."
@@ -216,7 +145,7 @@ strings.")
    (list (name* (package-name package)))
    (multiple-value-bind (docstring definitions)
        (package-api package)
-     (append (read-mk2 (markup-most-symbols docstring))
+     (append (read-mk2 docstring)
              (loop for head = definitions then (cddr head) while head
                 collect (render-symbol-definitions (car head)
                                                    (cadr head)))))))

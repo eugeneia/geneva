@@ -10,6 +10,4 @@
   :depends-on ("named-readtables"
                "geneva"
                "geneva-mk2"
-               "trivial-documentation"
-               "cl-ppcre"
-	       "cl-ppcre-unicode"))
+               "trivial-documentation"))
