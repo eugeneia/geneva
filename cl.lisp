@@ -33,7 +33,7 @@
 (defun docstring-document (docstring)
   "Compile document from DOCSTRING."
   (when docstring
-    (list* (paragraph "Description:")
+    (list* (paragraph #b"Description:")
            (read-mk2 docstring))))
 
 (defun value-string (value)
@@ -54,7 +54,7 @@
                 (:variable "Variable")
                 (:constant "Constant"))
                 name)
-            (document (paragraph "Initial Value:")
+            (document (paragraph #b"Initial Value:")
                       (make-plaintext nil (value-string value)))
             (docstring-document documentation))))
 
@@ -105,7 +105,7 @@
       class-definition
     (declare (ignore kind))
     (append (definition-template "Class" name (render-initargs initargs))
-            (document (paragraph "Class Precedence List:")
+            (document (paragraph #b"Class Precedence List:")
                       (render-class-precedence-list precedence-list))
             (docstring-document documentation))))
 
