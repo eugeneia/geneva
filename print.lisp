@@ -58,10 +58,10 @@
                    (escape (content-values markup))
                    delimiter2)))
     (ecase (content-type markup)
-      (#.+bold+      (escape-and-decorate #\*))
-      (#.+italic+    (escape-and-decorate #\_))
+      (#.+bold+        (escape-and-decorate #\*))
+      (#.+italic+      (escape-and-decorate #\_))
       (#.+fixed-width+ (escape-and-decorate #\{ #\}))
-      (#.+url+       (escape-and-decorate #\[ #\])))))
+      (#.+url+         (escape-and-decorate #\[ #\])))))
 
 (defun text-string (text)
   "Return string for TEXT."
