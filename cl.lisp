@@ -11,7 +11,6 @@
         :geneva.macros
         :trivial-documentation
 	:cl-ppcre)
-  (:import-from :alexandria :doplist)
   (:export :api-document))
 
 (in-package :geneva.common-lisp)
