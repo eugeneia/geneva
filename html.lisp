@@ -21,10 +21,7 @@
 (defparameter *id-prefix* "section"
   "Prefix for generated id strings.")
 
-(defvar *index-headers-p* nil
-  "Switch if headers are rendered indexed.")
-
-(defvar *header-level* 0
+(defparameter *header-level* 0
   "Header level.")
 
 (defun render-text (text)

@@ -14,9 +14,6 @@
 
 (in-readtable texp:syntax)
 
-(defparameter *index-headers-p* t
-  "Controls wether headers are numbered.")
-
 (defun latex-text ()
   "Text formatting implementation for LaTeX."
   (deftex genbold       (text) (textbf {($ text)}))

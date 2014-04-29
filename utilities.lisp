@@ -7,6 +7,7 @@
         :cl)
   (:export :*default-title*
            :*default-index-caption*
+           :*index-headers-p*
            :null-level
            :descend-level
            :incf-level
@@ -16,8 +17,14 @@
 
 (in-package :geneva.utilities)
 
-(defparameter *default-title* "Untitled")
-(defparameter *default-index-caption* "Table of Contents")
+(defparameter *default-title* "Untitled"
+  "Default title for documents.")
+
+(defparameter *default-index-caption* "Table of Contents"
+  "Default caption for indexes.")
+
+(defparameter *index-headers-p* t
+  "Controls wether headers are numbered.")
 
 (defun null-level ()
   "Returns the root level."
