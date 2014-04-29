@@ -144,8 +144,10 @@ GENEVA.MK2."
     (when (or author date)
       (terpri))
     (when index-p
-      (format t "~a~%~%" index-caption)
-      (render-index/mk2 (document-index document))
-      (terpri))
+      (let ((index (document-index document)))
+        (when index
+          (format t "~a~%~%" index-caption)
+          (render-index/mk2 index)
+          (terpri))))
     (dolist (content document)
       (render-content content level))))
