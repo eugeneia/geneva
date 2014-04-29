@@ -144,10 +144,11 @@
           ((stringp date) (tex (date {($ date)})))
           ((not date) (tex (date {}))))
     (when title (tex (maketitle)))
-    (when index-p (tex (renewcommand {(contentsname)}
-                                     {($ index-caption)})
-                       (tableofcontents)
-                       (newpage)))
+    (when (and index-p (document-index document))
+      (tex (renewcommand {(contentsname)}
+                         {($ index-caption)})
+           (tableofcontents)
+           (newpage)))
     (tex (pagenumbering {arabic})
          (setcounter {page} {1})
          (br))
