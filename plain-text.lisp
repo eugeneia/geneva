@@ -53,7 +53,8 @@ GENEVA.MK2."
   (with-indent/mk2 (0)
     (write-string (geneva.mk2::listing-string
                    (list text)
-                   (format nil "~a " (level-string level))))
+                   (format nil "~@[~a ~]" (when *index-headers-p*
+                                           (level-string level)))))
     (terpri)))
 
 (defun render-content (content &optional (level (null-level)))
@@ -104,13 +105,20 @@ GENEVA.MK2."
 
 (defun render-index/mk2 (index &optional (indent "   "))
   "Render INDEX as plain text using interal mk2 functions."
-  (loop for (level header subsections) in index
-        for prefix = (format nil "~a~a " indent (level-string level))
-     do
-       (write-string (geneva.mk2::listing-string (list header) prefix))
-       (render-index/mk2 subsections
-                         (make-string (length prefix)
-                                      :initial-element #\Space))))
+  (flet ((indent-string (n) (make-string n :initial-element #\Space)))
+    (loop for (level header subsections) in index
+       do (let ((prefix
+                 (format nil "~a~a"
+                         indent
+                         (if *index-headers-p*
+                             (format nil "~a " (level-string level))
+                             (indent-string
+                              (* 2 (1- (length level))))))))
+            (with-no-escape/mk2
+              (write-string
+               (geneva.mk2::listing-string (list header) prefix)))
+            (render-index/mk2 subsections
+                              (indent-string (length prefix)))))))
 
 (defun render-plain-text (document
                           &key (stream *standard-output*)
@@ -118,10 +126,12 @@ GENEVA.MK2."
                                author
                                date
                                (index-p t)
-                               (index-caption *default-index-caption*))
+                               (index-caption *default-index-caption*)
+                               (index-headers-p *index-headers-p*))
   "Render DOCUMENT as plain text to STREAM."
   (let ((level (null-level))
         (*standard-output* stream)
+        (*index-headers-p* index-headers-p)
         (geneva.mk2::*discard-text-markup-p* t))
     (when title
       (write-string (align-string title :center geneva.mk2::*columns*))
