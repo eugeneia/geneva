@@ -68,6 +68,12 @@
                {(includegraphics [width=0.8 (textwidth)]
                                  {($ url)})})))
 
+(defun latex-fallback-figure ()
+  "Fallback figure implementation for LaTeX."
+  (deftex genfallbackfigure (description url)
+    (genfigure {($ description)}
+               {(texttt {($ url)})})))
+
 (defun latex-text-figure ()
   "Text figure implementation for LaTeX."
   (deftex genverbatimstart ()
@@ -107,6 +113,7 @@
   (latex-figure)
   (latex-table)
   (latex-graphic-figure)
+  (latex-fallback-figure)
   (latex-text-figure)
   (latex-sections))
 

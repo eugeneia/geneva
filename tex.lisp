@@ -23,11 +23,13 @@
 ;;;
 ;;; Figures:
 ;;; \gengraphic{#1}{#2}
+;;; \genfallbackfigure{#1}{#2}
 ;;; \genverbatimstart
 ;;; \genverbatimend
 ;;; \genverbatimdescription{#1}
 ;;; E.g.:
 ;;;  (Graphic figure)   \gengraphic{...}{<URL>}
+;;;  (Fallback figure)  \genfallbackfigure{...}{<URL>}
 ;;;  (Plaintext figure) \genverbatimstart ... \genverbatimend
 ;;;                     \genverbatimdescription{...}
 ;;;
@@ -41,6 +43,7 @@
   (:use :cl
 	:geneva
 	:texp
+        :file-types
         :named-readtables)
   (:export :render-tex))
 
@@ -114,12 +117,16 @@
 	 (br))))
 
 (defun render-media (media-object)
-  "Render MEDIA in TeX representation (can only be 2D graphics)."
+  "Render MEDIA in TeX representation."
   (multiple-value-bind (description url)
       (content-values media-object)
-    (tex (gengraphic {($ (render-text description))}
-                     {($ (escape url))})
-	 (br))))
+    (if (file-tags url :image)
+        (tex (gengraphic {($ (render-text description))}
+                         {($ (escape url))})
+             (br))
+        (tex (genfallbackfigure {($ (render-text description))}
+                                {($ (escape url))})
+             (br)))))
 
 (defun render-plaintext (plaintext-object)
   "Render PLAINTEXT-OBJECT in TeX representation."
