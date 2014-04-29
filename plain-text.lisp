@@ -121,7 +121,8 @@ GENEVA.MK2."
                                (index-caption *default-index-caption*))
   "Render DOCUMENT as plain text to STREAM."
   (let ((level (null-level))
-        (*standard-output* stream))
+        (*standard-output* stream)
+        (geneva.mk2::*discard-text-markup-p* t))
     (when title
       (write-string (align-string title :center geneva.mk2::*columns*))
       (terpri))

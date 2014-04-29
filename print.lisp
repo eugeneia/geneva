@@ -20,6 +20,10 @@
 (defparameter *beginning* t
   "Flag indicating wether this is the bedinning of the document.")
 
+(defparameter *discard-text-markup-p* nil
+  "This hook is used by GENEVA.PLAIN-TEXT to disable text markup. Its a
+hack!")
+
 (defun escape (string)
   "Escape special tokens STRING."
   (flet ((needs-escape-p (char) (member char *to-escape*))
@@ -69,7 +73,9 @@
     (dolist (item text)
       (write-string (if (stringp item)
                         (escape item)
-                        (markup-string item))))))
+                        (if *discard-text-markup-p*
+                            (escape (content-values item))
+                            (markup-string item)))))))
 
 (defun listing-string (items &optional (bullet "+ "))
   "Return listing string for ITEMS using BULLET."
