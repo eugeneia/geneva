@@ -70,12 +70,12 @@ hack!")
 (defun text-string (text)
   "Return string for TEXT."
   (with-output-to-string (*standard-output*)
-    (dolist (item text)
-      (write-string (if (stringp item)
-                        (escape item)
+    (dolist (text-part text)
+      (write-string (if (stringp text-part)
+                        (escape text-part)
                         (if *discard-text-markup-p*
-                            (escape (content-values item))
-                            (markup-string item)))))))
+                            (escape (content-values text-part))
+                            (markup-string text-part)))))))
 
 (defun listing-string (items &optional (bullet "+ "))
   "Return listing string for ITEMS using BULLET."
