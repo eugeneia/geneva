@@ -52,16 +52,17 @@
 
 (defun document-index-2 (document level)
   "Base function for DOCUMENT-INDEX."
-  (flet ((section-p (content) (eq (content-type content) +section+)))
-    (mapcar (lambda (section)
-              (prog1 (multiple-value-bind (header contents)
-                         (content-values section)
-                       (list (copy-list level)
-                             header
-                             (document-index-2 contents
-                                               (descend-level level))))
-                (incf-level level)))
-            (remove-if-not #'section-p document))))
+  (flet ((section-p (content)
+           (eq (content-type content) +section+))
+         (section-entry (section)
+           (prog1 (multiple-value-bind (header contents)
+                      (content-values section)
+                    (list (copy-list level)
+                          header
+                          (document-index-2
+                           contents (descend-level level))))
+             (incf-level level))))
+    (mapcar #'section-entry (remove-if-not #'section-p document))))
 
 (defun document-index (document)
   "Returns section hierarchy on DOCUMENT."
