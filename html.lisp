@@ -193,7 +193,7 @@ the initial headline level and defauls to 0."
       (let ((index (document-index document)))
         (when index 
           (aside
-           (header (b index-caption))
+           (header (p (b index-caption)))
            (nav (render-index index))))))
     (render-contents document)))
 
