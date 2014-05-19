@@ -125,7 +125,7 @@ GENEVA.MK2."
                                title
                                author
                                date
-                               (index-p t)
+                               (index-p *index-p*)
                                (index-caption *default-index-caption*)
                                (index-headers-p *index-headers-p*))
   "Render DOCUMENT as plain text to STREAM."

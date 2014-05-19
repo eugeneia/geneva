@@ -7,6 +7,7 @@
         :cl)
   (:export :*default-title*
            :*default-index-caption*
+           :*index-p*
            :*index-headers-p*
            :null-level
            :descend-level
@@ -22,6 +23,9 @@
 
 (defparameter *default-index-caption* "Table of Contents"
   "Default caption for indexes.")
+
+(defparameter *index-p* t
+  "Controls wether an index is rendered.")
 
 (defparameter *index-headers-p* t
   "Controls wether headers are numbered.")

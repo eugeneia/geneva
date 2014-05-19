@@ -169,7 +169,7 @@ headlines."
                                   title
                                   author
                                   date
-                                  index-p
+                                  (index-p *index-p*)
                                   (index-caption *default-index-caption*)
                                   (index-headers-p *index-headers-p*)
                                   (id-prefix *id-prefix*)
@@ -202,7 +202,7 @@ the initial headline level and defauls to 0."
                               (title *default-title*)
                               author
                               date
-                              index-p
+                              (index-p *index-p*)
                               (index-caption *default-index-caption*)
                               (index-headers-p *index-headers-p*)
                               (id-prefix *id-prefix*)

@@ -125,7 +125,7 @@
                           title
                           author
                           (date :today)
-                          (index-p t)
+                          (index-p *index-p*)
                           (index-caption *default-index-caption*)
                           (index-headers-p *index-headers-p*)
                           (preamble #'default-preamble)
