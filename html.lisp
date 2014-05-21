@@ -220,6 +220,7 @@ the initial headline level and defauls to 0."
                     :index-p index-p
                     :index-caption index-caption
                     :index-headers-p index-headers-p
-                    :id-prefix id-prefix))
+                    :id-prefix id-prefix
+                    :header-level 1))
      :encoding encoding
      :stylesheets stylesheets)))
