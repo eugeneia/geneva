@@ -33,8 +33,7 @@
 (defun docstring-document (docstring)
   "Compile document from DOCSTRING."
   (when docstring
-    (list* (paragraph #b"Description:")
-           (read-mk2 docstring))))
+    (read-mk2 docstring)))
 
 (defun value-string (value)
   "Return pretty string for VALUE."
