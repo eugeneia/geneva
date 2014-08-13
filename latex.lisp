@@ -34,6 +34,7 @@
   (deftex genitem (text) (item ($ text)))
   (deftex genlisting (items)
     (begin {itemize})
+    (raggedright)
     ($ items)
     (end {itemize})))
 
