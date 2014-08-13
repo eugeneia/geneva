@@ -149,7 +149,7 @@
       (tex (renewcommand {(contentsname)}
                          {($ index-caption)})
            (tableofcontents)
-           (newpage)))
+           (bigskip)))
     (tex (pagenumbering {arabic})
          (setcounter {page} {1})
          (br))
