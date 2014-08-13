@@ -19,7 +19,7 @@
   (deftex genbold       (text) (textbf {($ text)}))
   (deftex genitalic     (text) (textit {($ text)}))
   (deftex genfixedwidth (text) (texttt {($ text)}))
-  (deftex genurl        (text) (underline  {($ text)}))
+  (deftex genurl        (text) (url    {($ text)}))
 
   (deftex gentinyparagraph (text)
     (medskip)
@@ -119,7 +119,8 @@
   "Minimal default preamble."
   (tex (documentclass {article})
        (usepackage {graphicx})
-       (usepackage {alltt})))
+       (usepackage {alltt})
+       (usepackage [hyphens] {url})))
 
 (defun render-latex (document
                      &key (stream *standard-output*)
