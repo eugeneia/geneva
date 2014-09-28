@@ -72,7 +72,7 @@
       (loop for head = lambda-list then (cdr head) while head
          for x = (car head)
          if (listp x)
-         append `("(" ,@(render-lambda-list x) ")")
+         append `(,#f"(" ,@(render-lambda-list x) ,#f")")
          else collect
            (case x
              ((&key &allow-other-keys &aux &body
