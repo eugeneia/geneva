@@ -14,8 +14,10 @@
 (defun test-join-strings ()
   "Test JOIN-STRINGS."
   (assert (equal (geneva::join-strings
-                  '("foo" " bar" nil "baz " nil "boom" "yeah"))
-                 '("foo bar" nil "baz " nil "boomyeah"))))
+                  '("foo" " bar" (:bold "|") "baz " (:bold "|")
+                    "boom" "yeah"))
+                 '("foo bar" (:bold "|") "baz " (:bold "|")
+                   "boomyeah"))))
 
 (defun test-normalize-whitespace ()
   "Test NORMALIZE-WHITESPACE."
@@ -39,7 +41,7 @@
                    ""))
   (assert (string= (geneva::normalize-whitespace
                     "    ")
-                   "")))
+                   " ")))
 
 (defun test-normalize-text-whitespace ()
   "Test NORMALIZE-TEXT-WHITESPACE."
@@ -50,16 +52,16 @@
                    (:bold "are you") "?")))
   (assert (equal (geneva::normalize-text-whitespace
                   '())
-                  '()))
+                 '()))
   (assert (equal (geneva::normalize-text-whitespace
                   '(""))
-                  '("")))
+                 '("")))
   (assert (equal (geneva::normalize-text-whitespace
                   '(" Hello "))
-                  '("Hello")))
+                 '("Hello")))
   (assert (equal (geneva::normalize-text-whitespace
                   '(" Hello you "))
-                  '("Hello you"))))
+                 '("Hello you"))))
 
 (defun test-normalize-text ()
   "Test NORMALIZE-TEXT."
@@ -89,5 +91,4 @@
 
   bar
 boom
- baz
-")))
+ baz")))

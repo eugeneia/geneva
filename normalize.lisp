@@ -20,24 +20,25 @@
 (defun normalize-whitespace (string &key trim)
   "Normalize *WHITESPACE* in STRING and optionally TRIM :LEFT,
 :RIGHT or :BOTH."
-  (let* ((words (split-sequence-if
-                 (lambda (char)
-                   (member char *whitespace*))
-                 string))
-         (stripped (remove "" words :test #'equal)))
-    (if stripped
-        (format nil "~:[ ~;~]~{~a~^ ~}~:[ ~;~]"
-                (or (null stripped)
-                    (eq :left trim)
-                    (eq :both trim)
-                    (< 0 (length (first words))))
-                stripped
-                (or (null stripped)
-                    (eq :right trim)
-                    (eq :both trim)
-                    (< 0 (length (first (last words))))))
-        ;; STRING was only whitespace.
-        " ")))
+  (if (string= string "") ""
+      (let* ((words (split-sequence-if
+                     (lambda (char)
+                       (member char *whitespace*))
+                     string))
+             (stripped (remove "" words :test #'equal)))
+        (if stripped
+            (format nil "~:[ ~;~]~{~a~^ ~}~:[ ~;~]"
+                    (or (null stripped)
+                        (eq :left trim)
+                        (eq :both trim)
+                        (< 0 (length (first words))))
+                    stripped
+                    (or (null stripped)
+                        (eq :right trim)
+                        (eq :both trim)
+                        (< 0 (length (first (last words))))))
+            ;; STRING was only whitespace.
+            " "))))
 
 (defun normalize-text-item (item &key trim)
   "Normalize *WHITESPACE* in text ITEM and optionally TRIM :LEFT or
