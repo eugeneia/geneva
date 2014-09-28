@@ -62,20 +62,22 @@ hack!")
                    (escape (content-values markup))
                    delimiter2)))
     (ecase (content-type markup)
-      (#.+bold+        (escape-and-decorate #\*))
-      (#.+italic+      (escape-and-decorate #\_))
-      (#.+fixed-width+ (escape-and-decorate #\{ #\}))
-      (#.+url+         (escape-and-decorate #\[ #\])))))
+      (:bold        (escape-and-decorate #\*))
+      (:italic      (escape-and-decorate #\_))
+      (:fixed-width (escape-and-decorate #\{ #\}))
+      (:url         (escape-and-decorate #\[ #\])))))
 
 (defun text-string (text)
   "Return string for TEXT."
   (with-output-to-string (*standard-output*)
-    (dolist (text-part text)
-      (write-string (if (stringp text-part)
-                        (escape text-part)
-                        (if *discard-text-markup-p*
-                            (escape (content-values text-part))
-                            (markup-string text-part)))))))
+    (dolist (text-token text)
+      (write-string (ecase (content-type text-token)
+                      (:plain
+                       (escape #1=(content-values text-token)))
+                      ((:bold :italic :fixed-width :url)
+                       (if *discard-text-markup-p*
+                           (escape #1#)
+                           (markup-string text-token))))))))
 
 (defun listing-string (items &optional (bullet "+ "))
   "Return listing string for ITEMS using BULLET."
@@ -139,52 +141,52 @@ hack!")
   "Print CONTENT."
   (ecase (content-type content)
     
-    (#.+paragraph+ (print-string
-                    (text-string (content-values content)))
-                   (terpri))
+    (:paragraph (print-string
+                 (text-string (content-values content)))
+                (terpri))
 
-    (#.+listing+   (print-string
-                    (listing-string (content-values content))
-                    :wrap nil))
+    (:listing   (print-string
+                 (listing-string (content-values content))
+                 :wrap nil))
 
-    (#.+table+     (multiple-value-bind (caption rows)
-                       (content-values content)
-                     (print-string
-                      (caption-string *table-keyword* caption))
-                     (print-string (table-string rows) :wrap nil)))
+    (:table     (multiple-value-bind (caption rows)
+                    (content-values content)
+                  (print-string
+                   (caption-string *table-keyword* caption))
+                  (print-string (table-string rows) :wrap nil)))
 
-    (#.+media+     (multiple-value-bind (caption url)
-                       (content-values content)
-                     (print-string
-                      (caption-string *media-keyword* caption))
-                     (print-string url :wrap nil)
-                     (terpri)))
+    (:media     (multiple-value-bind (caption url)
+                    (content-values content)
+                  (print-string
+                   (caption-string *media-keyword* caption))
+                  (print-string url :wrap nil)
+                  (terpri)))
 
-    (#.+plaintext+ (multiple-value-bind (caption pre)
-                       (content-values content)
-                     (print-string
-                      (caption-string *plaintext-keyword* caption))
-                     (print-plaintext pre)
-                     (format t "~&")
-                     (print-string "#" :wrap nil)
-                     (terpri)))
+    (:plaintext (multiple-value-bind (caption pre)
+                    (content-values content)
+                  (print-string
+                   (caption-string *plaintext-keyword* caption))
+                  (print-plaintext pre)
+                  (format t "~&")
+                  (print-string "#" :wrap nil)
+                  (terpri)))
 
-    (#.+section+   (multiple-value-bind (header contents)
-                       (content-values content)
-                     ;; Delimit following sections with extra whitespace
-                     (if *beginning*
-                         (setf *beginning* nil)
-                         (terpri))
-                     (print-string
-                      (format nil "< ~a" (text-string header)))
-                     (terpri)
-                     (incf *indent*)
-                     (unwind-protect
-                          (dolist (content contents)
-                            (print-content content))
-                       (decf *indent*))
-                     (print-string ">" :wrap nil)
-                     (terpri)))))
+    (:section   (multiple-value-bind (header contents)
+                    (content-values content)
+                  ;; Delimit following sections with extra whitespace
+                  (if *beginning*
+                      (setf *beginning* nil)
+                      (terpri))
+                  (print-string
+                   (format nil "< ~a" (text-string header)))
+                  (terpri)
+                  (incf *indent*)
+                  (unwind-protect
+                       (dolist (content contents)
+                         (print-content content))
+                    (decf *indent*))
+                  (print-string ">" :wrap nil)
+                  (terpri)))))
 
 (defun print-mk2 (document &optional (stream *standard-output*)
                            &key      (columns *columns*))

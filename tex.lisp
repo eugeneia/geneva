@@ -54,23 +54,19 @@
 (defvar *section-level* 0
   "Section level.")
 
-(defun render-text-markup (text-part)
-  "Render TeX macro call for marked up TEXT-PART."
-  (let ((text-part-string (escape (content-values text-part))))
-    (case (content-type text-part)
-      (#.+bold+        (tex (genbold       {($ text-part-string)})))
-      (#.+italic+      (tex (genitalic     {($ text-part-string)})))
-      (#.+fixed-width+ (tex (genfixedwidth {($ text-part-string)})))
-      (#.+url+         (tex (genurl        {($ text-part-string)})))
-      (otherwise       (error "TEXT-PART has invalid content-type: ~S."
-                              (content-type text-part))))))
+(defun render-text-token (text-token)
+  "Render TEXT-TOKEN as TeX using macro calls for markup tokens."
+  (ecase (content-type text-token)
+    (:plain       (write-string #1=(escape (content-values text-token))))
+    (:bold        (tex (genbold       {($ #1#)})))
+    (:italic      (tex (genitalic     {($ #1#)})))
+    (:fixed-width (tex (genfixedwidth {($ #1#)})))
+    (:url         (tex (genurl        {($ #1#)})))))
 
 (defun render-text (text)
   "Render TEXT in TeX representation."
-  (dolist (text-part text)
-    (if (stringp text-part)
-	(write-string (escape text-part))
-	(render-text-markup text-part)))
+  (dolist (text-token text)
+    (render-text-token text-token))
   (values))
 
 (defun tiny-paragraph-p (paragraph)
@@ -160,12 +156,12 @@
 (defun render-content (content)
   "Render CONTENT in html representation."
   (case (content-type content)
-    (#.+paragraph+ (render-paragraph content))
-    (#.+listing+   (render-listing content))
-    (#.+table+     (render-table content))
-    (#.+media+     (render-media content))
-    (#.+plaintext+ (render-plaintext content))
-    (#.+section+   (render-section content))
+    (:paragraph (render-paragraph content))
+    (:listing   (render-listing content))
+    (:table     (render-table content))
+    (:media     (render-media content))
+    (:plaintext (render-plaintext content))
+    (:section   (render-section content))
     (t (error "Invalid content type in CONTENT: ~S."
 	      (content-type content)))))
 

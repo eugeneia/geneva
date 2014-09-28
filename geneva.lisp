@@ -6,17 +6,7 @@
 traverse Geneva document.")
   (:use :cl
         :split-sequence)
-  (:export :+paragraph+
-	   :+listing+
-	   :+table+
-	   :+media+
-	   :+plaintext+
-	   :+section+
-	   :+bold+
-	   :+italic+
-	   :+fixed-width+
-	   :+url+
-	   :make-paragraph
+  (:export :make-paragraph
 	   :make-listing
 	   :make-table
 	   :make-media

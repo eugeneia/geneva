@@ -26,17 +26,13 @@
 
 (defun render-text (text)
   "Render TEXT as HTML."
-  (dolist (text-part text)
-    (if (stringp text-part)
-	(write-string text-part)
-	(let ((text-part-string (content-values text-part)))
-	  (case (content-type text-part)
-	    (#.+bold+ (b text-part-string))
-	    (#.+italic+ (i text-part-string))
-	    (#.+fixed-width+ (code text-part-string))
-	    (#.+url+ (a [:href text-part-string] text-part-string))
-	    (t (error "TEXT-PART has invalid content-type: ~S."
-		      (content-type text-part))))))))
+  (dolist (text-token text)
+    (ecase (content-type text-token)
+      (:plain (text #1=(content-values text-token)))
+      (:bold (b #1#))
+      (:italic (i #1#))
+      (:fixed-width (code #1#))
+      (:url (a [:href #1#] #1#)))))
 
 (defun render-paragraph (paragraph)
   "Render PARAGRAPH as HTML."
@@ -128,12 +124,12 @@ prefix headline with LEVEL."
 (defun render-content (content level)
   "Render CONTENT as HTML."
   (case (content-type content)
-    (#.+paragraph+ (render-paragraph content))
-    (#.+listing+   (render-listing content))
-    (#.+table+     (render-table content))
-    (#.+media+     (render-media content))
-    (#.+plaintext+ (render-plaintext content))
-    (#.+section+   (render-section content level))
+    (:paragraph (render-paragraph content))
+    (:listing   (render-listing content))
+    (:table     (render-table content))
+    (:media     (render-media content))
+    (:plaintext (render-plaintext content))
+    (:section   (render-section content level))
     (t (error "Invalid content type in CONTENT: ~S."
 	      (content-type content)))))
 

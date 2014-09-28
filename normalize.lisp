@@ -3,11 +3,12 @@
 (in-package :geneva)
 
 (defun join-strings (text)
-  "Join strings in TEXT."
+  "Join :PLAIN text tokens in TEXT."
   (reduce (lambda (text item)
             (let ((last-item (first (last text))))
-              (if (and (stringp item)
-                       (stringp last-item))
+              (if (and text
+                       (eq (content-type item) :plain)
+                       (eq (content-type last-item) :plain))
                   `(,@(butlast text)
                     ,(concatenate 'string last-item item))
                   (append text (list item)))))
@@ -41,20 +42,18 @@
 (defun normalize-text-item (item &key trim)
   "Normalize *WHITESPACE* in text ITEM and optionally TRIM :LEFT or
 :RIGHT."
-  (if (stringp item)
-      (normalize-whitespace item :trim trim)
-      (list (first item)
-            (normalize-whitespace (second item) :trim trim))))
+  (ecase #1=(content-type item)
+    (:plain
+     (normalize-whitespace #2=(content-values item) :trim trim))
+    ((:bold :italic :fixed-width :url)
+     (list #1# (normalize-whitespace #2# :trim trim)))))
 
 (defun position-non-whitespace-item (text &optional from-end)
   "Get position of first non-whitespace item in TEXT and maybe start
 FROM-END."
   (labels ((whitespace-p (c) (member c *whitespace*))
            (whitespace-item-p (item)
-             (not (find-if-not #'whitespace-p
-                               (if (stringp item)
-                                   item
-                                   (second item))))))
+             (not (find-if-not #'whitespace-p (content-values item)))))
     (position-if-not #'whitespace-item-p text :from-end from-end)))
 
 (defun trim-whitespace-items (text)

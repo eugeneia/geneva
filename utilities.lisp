@@ -49,15 +49,13 @@
 (defun text-string (text)
   "Return TEXT string without markup."
   (with-output-to-string (*standard-output*)
-    (dolist (text-part text)
-      (write-string (if (stringp text-part)
-                        text-part
-                        (content-values text-part))))))
+    (dolist (text-token text)
+      (write-string (content-values text-token)))))
 
 (defun document-index-2 (document level)
   "Base function for DOCUMENT-INDEX."
   (flet ((section-p (content)
-           (eq (content-type content) +section+))
+           (eq (content-type content) :section))
          (section-entry (section)
            (prog1 (multiple-value-bind (header contents)
                       (content-values section)

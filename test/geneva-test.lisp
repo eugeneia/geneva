@@ -45,9 +45,9 @@
   "Test NORMALIZE-TEXT-WHITESPACE."
   (assert (equal (geneva::normalize-text-whitespace
                   '(" Hello world  what "
-                    (:b "are you") "?  "))
+                    (:bold "are you") "?  "))
                  '("Hello world what "
-                   (:B "are you") "?")))
+                   (:bold "are you") "?")))
   (assert (equal (geneva::normalize-text-whitespace
                   '())
                   '()))
@@ -64,17 +64,17 @@
 (defun test-normalize-text ()
   "Test NORMALIZE-TEXT."
   (assert (equal (geneva::normalize-text
-                  '((:i "") " Hello world " " what "
-                    (:b "are you") "?  "))
+                  '((:italic "") " Hello world " " what "
+                    (:bold "are you") "?  "))
                  '("Hello world what "
-                   (:B "are you") "?")))
+                   (:bold "are you") "?")))
   (assert (equal (geneva::normalize-text
-                  '(" " (:i "") " Hello world " " what "
-                    (:b "are you") " "))
+                  '(" " (:italic "") " Hello world " " what "
+                    (:bold "are you") " "))
                  '("Hello world what "
-                   (:B "are you"))))
+                   (:bold "are you"))))
   (assert (equal (geneva::normalize-text
-                  '("" (:i " ") " f " (:b " ") ""))
+                  '("" (:italic " ") " f " (:bold " ") ""))
                  '("f"))))
 
 (defun test-normalize-plaintext ()
