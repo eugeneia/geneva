@@ -14,10 +14,10 @@
 ;;; E.g.: \genlisting{\genitem{...} ...}
 ;;;
 ;;; Table:
-;;; \gentable{#1}{#2} \genhead{#1} \genrow{#1} \gencolumn{#1}
-;;; E.g.: \gentable{Description...}{
-;;;         \genrow{\genhead{...} ...}
-;;;         \genrow{\gencolumn{...} ...}
+;;; \gentable{#1}{#2}{#3} \genhead{#1} \genrow{#1} \gencolumn{#1}
+;;; E.g.: \gentable{Description...}{XX...}{
+;;;         \genrow{\genhead{...} \gencolsep... \genhead{...}}
+;;;         \genrow{\gencolumn{...} \gencolsep \gencolumn{...}...}
 ;;;         ...
 ;;;       }
 ;;;
@@ -93,26 +93,42 @@ paragraph_."
 	      (tex (genitem {($ (render-text item))}))))})
        (br)))
 
-(defun render-table-row (row)
+(defun render-table-row (row &optional (type :column))
   "Render ROW in TeX representation."
-  (dolist (column row)
-    (tex (gencolumn {($ (render-text column))}))))
+  (loop for head = row then (cdr head)
+        for column = (car head)
+        while head do
+       (ecase type
+         (:column (tex (gencolumn {($ (render-text column))})))
+         (:head   (tex (genhead {($ (render-text column))}))))
+       (when (cdr head)
+         (tex (gencolsep)))))
 
-(defun render-table-headrow (headrow)
-  "Render HEADROW in TeX representation."
-  (dolist (column headrow)
-    (tex (genhead {($ (render-text column))}))))
+(defun table-format (rows)
+  "Compute table format for ROWS."
+  (let* ((thresh 16)
+         (n (loop for row in rows maximize (length row)))
+         (cs (loop for i from 0 to (1- n)
+                   for max = (loop for row in rows
+                                maximize (text-length (nth i row)))
+                if (> max thresh) collect max
+                else collect thresh))
+         (sum (loop for c in cs sum c))
+         (rs (loop for c in cs
+                collect (float (* (/ c sum) n)))))
+    (format nil "~{>{\\hsize~a\\hsize}X~}" rs)))
 
 (defun render-table (table)
   "Render TABLE in TeX representation."
   (multiple-value-bind (description rows)
       (content-values table)
     (tex (gentable
-	  {($ (render-text description))}
-	  {(genrow {($ (render-table-headrow (first rows)))})
-	   ($ (dolist (row (rest rows))
-		(tex (genrow {($ (render-table-row row))}))))})
-	 (br))))
+          {($ (render-text description))}
+          {($ (table-format rows))}
+          {(genrow {($ (render-table-row (first rows) :head))})
+          ($ (dolist (row (rest rows))
+               (tex (genrow {($ (render-table-row row))}))))})
+         (br))))
 
 (defun render-media (media-object)
   "Render MEDIA in TeX representation."

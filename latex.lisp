@@ -49,15 +49,16 @@
 
 (defun latex-table ()
   "Table implementaton for LaTeX."
-  (deftex gencolumn (text) ($ text) " & ")
-  (deftex genhead (text) (genbold {($ text)}) " & ")
+  (deftex gencolsep () " & ")
+  (deftex gencolumn (text) ($ text))
+  (deftex genhead (text) (genbold {($ text)}))
   (deftex genrow (columns) ($ columns) "\\\\[0.5em]")
-  (deftex gentable (description rows)
+  (deftex gentable (description format rows)
     (genfigure {($ description)}
-               {(begin {tabular}
-                       {llllllllllll}) ;; hack
+               {(begin {tabularx} {(columnwidth)}
+                       {($ format)})
                ($ rows)
-               (end {tabular})})))
+               (end {tabularx})})))
 
 (defun latex-graphic-figure ()
   "Graphic figure implementation for LaTeX."
@@ -119,6 +120,7 @@
   "Minimal default preamble."
   (tex (documentclass {article})
        (usepackage {graphicx})
+       (usepackage {tabularx})
        (usepackage {alltt})
        (usepackage {float})
        (usepackage [hyphens] {url})))
