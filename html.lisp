@@ -199,9 +199,8 @@ the initial headline level and defauls to 0."
     (when index-p
       (let ((index (document-index document)))
         (when index 
-          (aside
-           (header (p (b index-caption)))
-           (nav (render-index index))))))
+          (nav (header (p (b index-caption)))
+               (render-index index)))))
     (render-contents document)))
 
 (defun render-html-file (document
