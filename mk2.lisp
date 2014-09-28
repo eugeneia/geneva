@@ -33,6 +33,9 @@
         :split-sequence)
   (:export :read-mk2
            :syntax-error
+           :open-section
+           :malformed-element
+           :unrecognized-input
            :line-position
            :character-position
            :print-mk2))
