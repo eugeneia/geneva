@@ -1,219 +1,209 @@
-< Abstract
+_Mk2_ is a human readable plain text language for expressing Geneva
+documents.¹ It is designed with both ergonomics and technical pragmatism
+in mind.
 
- The {document} format is a *plain text* input language designed to
- express simple documents. It supports basic text formatting which
- consists of *paragraphs*, *lists*, *bold*, *italic* and *fixed width*
- text as well as *hyperlinks*. It allows structuring documents by means
- of *sections* with headlines. It also supports embedding of *tables*,
- *preformatted plain text* and media such as but not limited to *images*,
- *audio* and *video* data.
++ 1. [geneva-document.html]
 
- Its implementation features an {HTML5} compatible output generator. The
- resulting _HTML_ output can be combined with _CSS style sheets_ to
- produce *rich web documents* and *print media*
- (see [http://www.princexml.com/]).
 
- This specification of the {document} format itself is written in the
- {document} language and serves also as a tutorial and as an example for
- its usage.
+< Syntax
+
+ This formal definition uses the modified _BNF syntax_ of _ANSI CL's
+ Notational Conventions_.¹ The following axioms are used throughout the
+ definition:
+
+ _String_—A character sequence. The exact grammar depends on the
+ surrounding context.
+
+ _LF_—A newline character. The exact representation is platform
+ dependent.
+
+ _EOF_—The end of input.
+
+ _SP_—A whitespace character. The exact set of characters considered
+ whitespace is platform dependent.
+
+ + 1. [http://users-phys.au.dk/harder/Notational-Conventions.html]
+
+ < Document and Section
+
+  #table *Table 1.* _Document_ and _section_ syntax.#
+  | Symbol         | Expression
+  | document       | {[} element separator {]}{*} _EOF_
+  | section        | {"<"} title separator {[} element separator {]}{*} {">"} separator
+  | title          | rich-text
+  | element        | section {|} table {|} plaintext {|} media {|} listing {|} paragraph
+  | separator      | double-lf {|} _EOF_
+  | double-lf | _LF_ {[} _LF_  {]}{+}
+
+ >
+
+ < Paragraph and Listing
+
+  #table *Table 2.* _Paragraph_ and _Listing_ syntax.#
+  | Symbol    | Expression
+  | paragraph | text-token{+}
+  | listing   | item{+}
+  | item      | {"+"} rich-text
+
+ >
+
+ < Table, Media and Plaintext
+
+  #table *Table 3.* _Table_ syntax.#
+  | Symbol      | Expression
+  | table       | {"#table"} description {"#"} _LF_ table-body
+  | description | rich-text
+  | table-body  | row{*} last-row
+  | row         | column{+} _LF_
+  | last-row    | column{+}
+  | column      | {"|"} rich-text
+
+  #table *Table 4.* _Media_ syntax.#
+  | Symbol       | Expression
+  | media        | {"#media"} description {"#"} _LF_ _String_
+  | description  | rich-text
+
+  #table *Table 5.* _Plaintext_ syntax.#
+  | Symbol      | Expression
+  | plaintext   | {"#code"} description {"#"} _LF_ line{+} end
+  | description | rich-text
+  | line        |  _String_ _LF_
+  | end         | _SP_{*} {"#"}
+
+ >
+
+ < Rich Text
+
+  #table *Table 6.* _Rich text_ syntax.#
+  | Symbol      | Expression
+  | rich-text   | text-token{*}
+  | text-token  | bold {|} italic {|} fixed-width {|} url {|} plain
+  | bold        | {"*"} _String_ {"*"}
+  | italic      | {"_"} _String_ {"_"}
+  | fixed-width | {"{"} _String_ {"\}"}
+  | url         | {"["} _String_ {"]"}
+  | plain       | _String_
+
+ >
+
+ < Escape Rules
+
+  The {"\\"} (backslash) can be used to _escape_ the next character. The
+  grammatical significance of a character following {"\\"} is ignored.
+
+  The exact grammar of the _String_ axiom is context dependent. A
+  _String_ may not contain unescaped _terminating sequences_. A
+  terminating sequence is any token following the _String_ axiom in a
+  rule. In order to escape a terminating sequence its first character
+  must be escaped.
+
+  For illustration consider the grammar in _Table 7_ which utilizes the
+  _String_ axiom. In _rule_ the _String_ axiom is followed by
+  _terminator_, thus {"foo"} is a _terminating sequence_ of _String_ in
+  _rule_. Valid and invalid character sequences for _String_ in _rule_
+  are shown in _Table 8_.
+
+  #table *Table 7.* Exemplary grammar rules to illustrate escape rules
+         for the _String_ axiom.#
+  | Symbol     | Expression
+  | rule       | _String_ terminator
+  | terminator | {"foo"}
+
+  #table *Table 8.* Valid and invalid character sequences for _String_ in
+         _rule_.#
+  | Valid               | Invalid
+  | {quick brown \\foo} | {quick brown foo}
+
+ >
 
 >
 
 
-< Formatting text
+< Examples
 
- The abstract of this document already uses most text formatting
- functions, namely paragraphs, bold, italic and fixed width text and a
- hyperlink.
+ < Document and Section
 
- #table *Figure 2.1* Typesetting modifiers and their control characters.#
- | Type         | Control character(s)  | Example                | Rendering
- | Bold         | {*}                   | {*Bold text*}          | *Bold text*
- | Italic       | {_}                   | {_Italic text_}        | _Italic text_
- | Fixed width  | {{} and {\}}          | {{Fixed width text\}}  | {Fixed width text}
- | Hyperlink    | {[} and {]}           | {[http://google.de]}   | [http://google.de]
+  The Mk2 file in _Figure 1_ contains a paragraph (_A quick brown
+  fox..._) and a section titled "On Pangrams" which contains another
+  paragraph (_A pangram is..._).
 
- Pragraphs are set by seperating text passages with a blank line.
- Typesetting modifiers like bold text are expressed by surrounding parts
- of text with _control characters_ as seen in figure 2.1.
+  #code *Figure 1*#
+  A quick brown fox jumps over the lazy dog.
 
- #code *Figure 2.2* Source input for the first two paragraphs of the
- abstract section.#
+  < On Pangrams
 
- The {document} format is a *plain text* input language designed to
- express simple documents. It supports basic text formatting which
- consists of *paragraphs*, *lists*, *bold*, *italic* and *fixed width*
- text as well as *hyperlinks*. It allows structuring documents by means
- of *sections* with headlines. It also supports embedding of *tables*,
- *pre formatted plain text* and media such as but not limited to
- *images*, *audio* and *video* data.
-
- Its implementation features an {HTML5} compatible output generator. The
- resulting _HTML_ output can be combined with _CSS style sheets_ to
- produce *rich web documents* and *print media*
- (see [http://www.princexml.com/]).
- #
-
- Figure 2.2 shows an example input source demonstrating paragraphs and
- all available typesetting modifiers.
-
- #code *Figure 2.3* Source input for a list.#
-
- + List item one.
- + A list item with
-   a line break.
- + List item three.
- #
-
- Another supported form of text formatting is the list. Users can create
- lists by prepending the text passages that make up list items with the
- {+} character. For instance the source input from figure 2.3 expresses a
- list with three items and could be rendered like this:
-
- + List item one
- + A list item with
-   a line break
- + List item three
-
->
-
-
-< Quoting control characters
-
- Sometimes input text will contain control characters that invoke a
- syntax rule when it is not desired. In those cases users will need to
- _quote_ the offending character so that it is not interpreted as a
- control character.
-
- For example if a user wants to input the word "foo\*bar" he needs to
- quote the {*} control character with the quote character {\\}. The quote
- character itself can be quoted with a quote character.
-
- #code *Figure 3.1* Source input with quoted control characters.#
-
- For example if a user wants to input the word "foo\*bar" he needs to
- quote the {*} control character with the quote character {\\}.
- #
-
- The interpreter of the {document} input language is designed to reduce
- the need for quoting as much as possible.
-
->
-
-
-< Structuring documents
-
- Documents can be structured by dividing them into _sections_. Each
- section consists of a headline and a body. A sections headline is a
- regular text passage. The body of a section may contain any elements of
- a document including subsections.
-
- #code *Figure 4.1* Source input for a section.#
-
- < Section headline
-
-  Section body...
-
-  < Subsection headline
-
-   Subsection body...
+   A pangram is a phrase that contains all of the letters of the
+   alphabet.
 
   >
-
- >
- #
-
- Sections are opened with the {<} character followed by whitespace and a
- text passage that will be the section header. A blank line signifies
- the end of the section header and the start of the section body wich
- itself is terminated by the {>} character.
-
- The indenting of the section body in figure 4.1 is not mandated by the
- language but merely a convention to improve source input file
- readability.
- 
->
-
-
-< Embedding figures
-
- Documents can include three types of non-text objects. Namely *tables*,
- *media objects* such as but not restricted to images, audio or video
- files and *preformatted plain text*.
-
- #table *Figure 5.1* Embedding keywords.#
- | Embedding type           | Keyword
- | Table                    | {TABLE}
- | Media object             | {MEDIA}
- | Preformatted plain text  | {CODE}
-
- All three types of embedding share the same header syntax. An embedding
- starts with the {#} character followed by a _keyword_ (see figure
- 5.2). The keyword is followed by whitespace and a text passage
- terminated by another {#} character. The text passage will be the
- embeddings caption. The header is followed by the actual embedding wich
- varies for the different kinds of embedding types.
-
- #code *Figure 5.2* Generic syntax for embedding headers.#
-
- #KEYWORD HEADLINE#
- ...
- #
-
-
- < Tables
-
-  A table body consists of one row per line. Rows consist of columns wich
-  start with the {|} (vertical bar) character followed by a text
-  passage. A blank line signifies the end of the table.
-
-  #code *Figure 5.3* Source input for the table from figure 5.1.#
-
-  #table *Figure 5.2* Embedding keywords.#
-  | Embedding type           | Keyword
-  | Table                    | {TABLE}
-  | Media object             | {MEDIA}
-  | Preformatted plain text  | {CODE}
-  #
-
-  Alignment of the table columns as seen in figure 5.3 is not not
-  mandated by the language but merely a convention to improve source
-  input file readability.
-
- >
-
-
- < Media
-
-  Embedding arbitrary media is as simple as specifying a _URL_ after the
-  emdedding header. A blank line after the url signifies its end. How
-  given media is rendered depends on the output generator. The _HTML_
-  output generator supports images, audio and video data.
-
-  #code *Figure 5.4* Source input for a media embedding.#
-
-  #media Media caption.#
-  http://example.org/media
   #
 
  >
 
+ < Listing and Text Tokens
 
- < Preformatted plain text
+  The listing in _Figure 2_ contains five items, each being a single text
+  token.
 
-  After the {CODE} header arbitrary plain text can be entered. The plain
-  text passage is terminated by another {#} character. The plain text
-  will remain its formatting while the interpreter takes into account the
-  indenting of the embedding.
-
-  #code *Figure 5.5* Source input for a preformatted plain text
-  embedding.#
-
-  #code Code caption.#
-  arbitrary plain text
-  which will remain unchanged
-  \#
+  #code *Figure 2*#
+  + Plain text token
+  + *Bold text token*
+  + _Italic text token_
+  + {Fixed-width text token}
+  + [http://example.org/url/text-token]
   #
+
+ >
+
+ < Table, Media and Plaintext
+
+  The Mk2 file in _Figure 3_ contains table, media and plaintext object,
+  each having a description and their respective bodies.
+
+  #code *Figure 3*#
+  #table Source: Wikipedia.#
+  | State                  | Area          | Total Population
+  | Bavaria                | 70,549.44 km² | 12,604,244
+  | North Rhine-Westphalia | 34,084.13 km² | 17,571,856
+
+  #media Imaginary embedded video.#
+  http://example.org/video.ogv
+
+  #code {SQUARE} function in Common Lisp.#
+  (defun square (n)
+    (expt n 2))
+  #
+  #
+
+ >
+
+ < Escaping
+
+  Mk2 is designed to avoid the need of escaping control tokens as much as
+  possible. Still there are some cases where the user has to use the {\\}
+  (backslash) character to avoid the semantics of a specific token. Below
+  are examples of the most common cases.
+
+  #table *Figure 4.* Escaping unintended text token markup.#
+  | Mk2 | Result
+  | {In ECMAScript anonymous functions can be expressed using the {function (...) { ... \\\}\} special form.} \
+  | In ECMAScript anonymous functions can be expressed using the {function (...) { ... \}} special form.
+
+  The Mk2 file in _Figure 4_ escapes the first {\}} (curly bracket)
+  character inside a fixed width text token in order to avoid terminating
+  the fixed width token prematurely. Not that only the closing bracket
+  needs to be escaped because it is the only terminating token of the
+  _String_ in a fixed width token.
+
+
+  #table *Figure 5.* Including the literal backslash character.#
+  | Mk2 | Result
+  | {On DOS, {\\\\\} (backslash) is used to separate the components of a pathname.} \
+  | On DOS, {\\} (backslash) is used to separate the components of a pathname.
+
+  Sometimes the user needs to include the literal backslash character in
+  his prose. The {\\} (backslash) character can be escaped using itself
+  just like any other character as _Figure 5_ shows.
 
  >
 

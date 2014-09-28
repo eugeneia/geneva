@@ -1,40 +1,39 @@
 _Geneva_ is the portable document preparation system. It follows the
-principle _Write once, read anywhere_. The system isolates document
-content and structure from document presentation and thereby enables the
-creation and archival of highly portable documents.
+principle _Write once, read anywhere_. Geneva enables the creation and
+archival of truly portable documents by isolating document content and
+structure from document presentation.
 
-Geneva achieves this by employing a generic but well defined document
-structure in conjunction with a diverse toolchain composed of input
-interfaces and presentation backends. In addition to classic document
-features such as paragraphs, listings, sections, tables and text markup,
-Geneva defines a generic media type designed to be used to embed
-arbitrary figures and enable extensibility in a plug-in oriented way.
+Geneva achieves this by introducing a generic but well defined document
+structure independent from its stored representation. In addition to
+classic document features such as paragraphs, listings, sections, tables
+and text markup, Geneva defines a generic _media type_ for embedding
+arbitrary content and enable extensibility in a plug-in oriented way.
 
-The input interfaces, such as the plain text oriented {mk2} markup
-language and the Geneva API, are user and programmer facing frontends to
-document authoring. The presentation backends render documents to several
-targets including web, print and plain text media.
-
-#media Diagram of Geneva components.#
-geneva-components.svg
+_Open Geneva_ is the reference implementation of Geneva written in
+_Common Lisp_. It implements Geneva and defines a diverse toolchain
+composed of input interfaces and presentation backends. Its input
+interfaces, such as the plain text oriented _Mk2 markup language_ and the
+Geneva API, are user and programmer facing frontends to document
+authoring. Its presentation backends render documents to several targets
+including web, print and plain text media.
 
 
 < Documentation
 
- + Geneva document specification [geneva-document.mk2]
- + {GENEVA} API [geneva-api.mk2]
- + {GENEVA-MK2}, the {mk2} markup language frontend [mk2.mk2]
- + {GENEVA-PLANTEXT}, plaintext backend [geneva-plaintext.mk2]
- + {GENEVA-HTML}, web media backend [geneva-html.mk2]
- + {GENEVA-TEX}, print media backend [geneva-tex.mk2]
- + {GENEVA-CL}, _Common Lisp_ on-line documentation frontend
-   [geneva-cl.mk2]
+ + Geneva document specification [geneva-document.html]
+ + Open Geneva manual [open-geneva.html]
+ + Mk2 markup language specification [mk2.html]
 
 >
 
 
-< Maintainer
+< Getting the Source
 
- Max Rottenkolber [mailto:max@mr.gy]
+ The official upstream source is [geneva.git]. Use Git to get your
+ copy. For public development the repository is mirrored at GitHub
+ ([https://github.com/interstellar/geneva]).
+
+ You can get support and services regarding Geneva from Interstellar
+ <[mailto:service@interstellar.ventures]\>.
 
 >

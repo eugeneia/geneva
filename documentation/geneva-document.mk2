@@ -6,25 +6,26 @@ defines the following _element types_:
  + Table
  + Plaintext
  + Media
+ + Section
 
 
-< Rich text
+< Rich Text
 
  A central component of all element types is _rich text_. Rich text is
  defined as a sequence of _text tokens_, each made up of a character
  string and an attribute to signify its appearance. There are five
  different types of text tokens:
 
- #table Text token types.#
- | Name   | Description
- | plain  | Render sequence in regular font.
- | bold   | Recommends to render sequence in bold font.
- | italic | Recommends to render sequence in italic font.
- | code   | Recommends to render sequence in fixed-width font.
- | uri    | Interpret sequence as _Uniform Resource Identifier_.
+ #table *Table 1.* Text token types.#
+ | Name        | Description
+ | plain       | Render sequence in regular font.
+ | bold        | Recommends to render sequence in bold font.
+ | italic      | Recommends to render sequence in italic font.
+ | fixed-width | Recommends to render sequence in fixed-width font.
+ | url         | Interpret sequence as _Uniform Resource Locator_.
 
- The occurrance of _whitespace characters_ text tokens is restricted by
- the following rules:
+ The occurrance of _whitespace characters_ in text tokens is restricted
+ by the following rules:
 
   + Whitespace character sequences of length two or more are to be
     reduced to a single _space character_ ({ASCII 0x20} or equivalent).
@@ -36,16 +37,16 @@ defines the following _element types_:
  At least the following conceptual characters have to be recognized as
  whitespace:
 
- + Space
- + Tab
- + Newline (including Carriage Return)
- + Vertical Tab
- + Page break
+ + _Space_
+ + _Tab_
+ + _Newline_ (including _Carriage Return_)
+ + _Vertical Tab_
+ + _Page break_
 
 >
 
 
-< Element types
+< Element Types
 
  A *paragraph* consists of exactly one rich text sequence. It signifies a
  self-contained piece of text.
@@ -59,12 +60,12 @@ defines the following _element types_:
 
  A *plaintext* element consists of a verbatim character string and a
  single rich text sequence being its description. It signifies a sequence
- of characters which has to be left unchanged except for whitespace
+ of characters which has to be preserved as is except for whitespace
  prefixes and suffixes (including newlines).
 
- A *media* element consists of an Unique Resource Identifier and a single
- rich text sequence being its description. It signifies the embedment of
- an external resource.
+ A *media* element consists of an _Unique Resource Locator_ string and a
+ single rich text sequence being its description. It signifies the
+ embedment of an external resource.
 
  A description as mentioned above, is a piece of text elaborating the
  contents of a given element.
@@ -72,5 +73,29 @@ defines the following _element types_:
  A *section* consists of a Geneva document and a single rich text
  sequence being its heading. It signifies a continuous subsequence of the
  document, introduced by a headline (the heading).
+
+>
+
+
+< Formal Definition
+
+ The table below defines a Geneva document formally using the modifed BNF
+ syntax of ANSI CL's _Notational Conventions_¹.
+
+ #table *Table 2.* Formal definition of a Geneva document.#
+ | document         | document-element{*}
+ | document-element | pargraph {|} listing {|} table {|} plaintext {|} media {|} section
+ | paragraph        | text-token{+}
+ | listing          | rich-text{+}
+ | table            | rich-text table-row{+}
+ | table-row        | rich-text{+}
+ | plaintext        | rich-text string
+ | media            | rich-text string
+ | section          | rich-text document-element{*}
+ | rich-text        | text-token{*}
+ | text-token       | _A text token, see "Rich Text"_
+ | string           | _A character string_
+
+ + 1. [http://users-phys.au.dk/harder/Notational-Conventions.html]
 
 >
