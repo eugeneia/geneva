@@ -57,14 +57,12 @@
                 (:variable "Variable")
                 (:constant "Constant"))
                 name)
-            (document (paragraph #b"Initial Value:")
-                      (let ((value-string (value-string value)))
-                        (if (find #\Newline value-string)
-                            (plaintext
-                             ("Initial value of " (make-italic name))
-                             value-string)
-                            (paragraph
-                             (make-fixed-width value-string)))))
+            (document
+             (paragraph #b"Initial Value:")
+             (let ((value-string (value-string value)))
+               (if (find #\Newline value-string)
+                   (plaintext nil value-string)
+                   (paragraph (make-fixed-width value-string)))))
             (docstring-document documentation))))
 
 (defun render-lambda-list (lambda-list)
