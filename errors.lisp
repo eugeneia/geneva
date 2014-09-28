@@ -10,13 +10,13 @@
     :type (unsigned integer)
     :initform (error "Must supply LINE-POSITION.")
     :initarg :line
-    :accessor line-position
+    :reader line-position
     :documentation "Line position of SYNTAX-ERROR.")
    (character-position
     :type (unsigned integer)
     :initform (error "Must supply CHARACTER-POSITION.")
     :initarg :character
-    :accessor character-position
+    :reader character-position
     :documentation "Character position of SYNTAX-ERROR."))
   (:report print-syntax-error)
   (:documentation "Generic syntax error."))
