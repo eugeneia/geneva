@@ -76,11 +76,9 @@
   "Text figure implementation for LaTeX."
   (deftex genverbatimstart ()
     (begin {figure} ["H"])
-    (begin {quote})
     (begin {alltt}))
   (deftex genverbatimend ()
     "\\end{alltt}"
-    (end {quote})
     (vspace {-1em}))
   (deftex genverbatimdescription (description)
     (caption {($ description)})
