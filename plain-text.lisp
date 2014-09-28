@@ -128,13 +128,20 @@ GENEVA.MK2."
                                (index-p *index-p*)
                                (index-caption *default-index-caption*)
                                (index-headers-p *index-headers-p*))
-  "Render DOCUMENT as plain text to STREAM."
+  "*Description:*
+
+   {render-plain-text} renders _document_ as plain text.
+
+   *See Also:*
+
+    + _Common Rendering Interface_ [open-geneva.html#section-3-1]"
   (let ((level (null-level))
         (*standard-output* stream)
         (*index-headers-p* index-headers-p)
         (geneva.mk2::*discard-text-markup-p* t))
     (when title
-      (write-string (align-string title :center geneva.mk2::*columns*))
+      (write-string (align-string (string-upcase title)
+                                  :center geneva.mk2::*columns*))
       (terpri))
     (when author
       (write-string (align-string author :right geneva.mk2::*columns*)))
