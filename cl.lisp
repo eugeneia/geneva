@@ -113,10 +113,13 @@
   (destructuring-bind (&key kind documentation precedence-list initargs)
       class-definition
     (declare (ignore kind))
-    (append (definition-template "Class" name (render-initargs initargs))
-            (document (paragraph #b"Class Precedence List:")
-                      (render-class-precedence-list precedence-list))
-            (docstring-document documentation))))
+    (append
+     (if (member 'condition precedence-list)
+         (definition-template "Condition Type" name)
+         (definition-template "Class" name (render-initargs initargs)))
+     (document (paragraph #b"Class Precedence List:")
+               (render-class-precedence-list precedence-list))
+     (docstring-document documentation))))
 
 (defun render-type (name type-definition)
   "Renders TYPE-DEFINITION with NAME."
