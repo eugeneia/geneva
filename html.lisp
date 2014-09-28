@@ -139,6 +139,16 @@ headlines."
   (dolist (content contents)
     (render-content content level)))
 
+(defun render-title (title)
+  "Render TITLE with respect to *HEADER-LEVEL*."
+  (case *header-level*
+    (0 (h1 title))
+    (1 (h2 title))
+    (2 (h3 title))
+    (3 (h4 title))
+    (4 (h5 title))
+    (t (h6 title))))
+
 (defun make-id-href-string (id-string)
   "Returns id href string for ID-STRING."
   (concatenate 'string "#" id-string))
@@ -180,7 +190,8 @@ the initial headline level and defauls to 0."
 	(*header-level* header-level))
     (when (or title author date)
       (header (when title
-                (h1 title))
+                (render-title title)
+                (incf *header-level*))
               (when author
                 (p author))
               (when date
@@ -216,7 +227,6 @@ the initial headline level and defauls to 0."
                     :index-p index-p
                     :index-caption index-caption
                     :index-headers-p index-headers-p
-                    :id-prefix id-prefix
-                    :header-level 1))
+                    :header-level 0))
      :encoding encoding
      :stylesheets stylesheets)))
