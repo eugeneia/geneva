@@ -33,7 +33,7 @@
           (format t "~&~a~%" err))
    Should print "SYNTAX-ERROR at position 10:17." twice. |#
 
-(define-condition malformed-object (syntax-error) ()
+(define-condition malformed-element (syntax-error) ()
   (:documentation
    "Syntax error describing a malformed object."))
 

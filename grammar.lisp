@@ -86,7 +86,7 @@
             (description (=text (=or delimiter (=content-delimiter))))
             (_ (=or (=and delimiter (=newline*))
                     ;; Description is not terminated properly
-                    (=syntax-error 'malformed-object)))
+                    (=syntax-error 'malformed-element)))
             (body parser))
       (=result (funcall constructor description body)))))
 
@@ -101,7 +101,7 @@ We even allow multiline strings with escaped newlines."
   (=prog1 (=skip-horizontal-space (=string-of (=not (=token #\Newline))))
           (=or (=content-delimiter)
                ;; Object is not terminated properly
-               (=syntax-error 'malformed-object))))
+               (=syntax-error 'malformed-element))))
 
 (defun =table-column ()
   (=and (=token *table-item*)
@@ -119,7 +119,7 @@ We even allow multiline strings with escaped newlines."
                ;; Single newline is ok in case last row ate one.
                (=newline*)
                ;; Object is not terminated properly
-               (=syntax-error 'malformed-object))))
+               (=syntax-error 'malformed-element))))
 
 (defun =plaintext-terminator ()
   (=and (=skip-whitespace (=token *object-delimiter*))
@@ -133,7 +133,7 @@ We even allow multiline strings with escaped newlines."
 (defun =plaintext-body ()
   (=let* ((lines (=zero-or-more (=plaintext-line)))
           (_ (=or (=plaintext-terminator)
-                  (=syntax-error 'malformed-object))))
+                  (=syntax-error 'malformed-element))))
     (=result (format nil "~{~a~^~%~}" lines))))
 
 (defun =object ()
