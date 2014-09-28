@@ -1,4 +1,4 @@
-;;;; System definition for the Geneva document preparation system.
+;;;; System definition for GENEVA.
 
 (defsystem geneva
   :description

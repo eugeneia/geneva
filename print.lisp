@@ -18,7 +18,7 @@
   "Tokens to escape.")
 
 (defparameter *beginning* t
-  "Flag indicating wether this is the bedinning of the document.")
+  "Flag indicating wether this is the beginning of the document.")
 
 (defparameter *discard-text-markup-p* nil
   "This hook is used by GENEVA.PLAIN-TEXT to disable text markup. Its a
@@ -190,7 +190,23 @@ hack!")
 
 (defun print-mk2 (document &optional (stream *standard-output*)
                            &key      (columns *columns*))
-  "Print DOCUMENT to STREAM optimized for COLUMNS."
+  "*Arguments and Values:*
+
+   _document_—a Geneva _document_.
+
+   _stream_—a _character stream_. The default is _standard output_.
+
+   _columns_—an _unsigned integer_. The default is 72.
+
+   *Description:*
+
+   {print-mk2} writes the _Mk2_ representation of _document_ to _stream_.
+   {print-mk2} attempts to produce lines no longer than _comlums_ in its
+   output.
+
+   *See Also:*
+
+    + _The Mk2 markup language_ [mk2.html]"
   (let ((*columns* columns)
         (*standard-output* stream)
         (*indent* 0)

@@ -1,9 +1,9 @@
-;;;; Error conditions and routines for the grammar used by MK10.READER.
+;;;; Error conditions and routines used by the grammar of GENEVA.MK2.
 
 (in-package :geneva.mk2)
 
 
-;;; Syntax error conditions
+;;; Syntax error conditions.
 
 (define-condition syntax-error (error)
   ((line-position
@@ -19,11 +19,50 @@
     :reader character-position
     :documentation "Character position of SYNTAX-ERROR."))
   (:report print-syntax-error)
-  (:documentation "Generic syntax error."))
+  (:documentation
+   "*Description:*
+
+    The _type_ {syntax-error} consists of error conditions that occur
+    during {read-mk2}. It denotes a syntax error in the input to
+    {read-mk2}. The functions {line-position} and {character-position}
+    can be used to retrieve the position where the error occurred.
+
+    *See Also:*
+
+    + character-position
+    + line-position"))
+
+(setf (documentation 'line-position 'function)
+      "*Arguments and Values:*
+
+       _syntax-error_—an _error_ of type {syntax-error}.
+
+       *Description:*
+
+       {line-position} returns a _positive integer_ specifying the line
+       of input on which _syntax-error_ occured.
+
+       *See Also:*
+
+       + syntax-error")
+
+(setf (documentation 'character-position 'function)
+      "*Arguments and Values:*
+
+       _syntax-error_—an _error_ of type {syntax-error}.
+
+       *Description:*
+
+       {character-position} returns a _positive integer_ specifying the
+       character position in the line on which _syntax-error_ occured.
+
+       *See Also:*
+
+       + syntax-error")
 
 (defun print-syntax-error (syntax-error
                            &optional (stream *error-output*))
-  "Print SYNTAX-ERROR to STREAM."
+  "Print SYNTAX-ERROR to STREAM (which defaults to *ERROR-OUTPUT*)."
   (format stream "~a at position ~a:~a."
           (type-of syntax-error)
           (line-position syntax-error)
@@ -35,7 +74,15 @@
 
 (define-condition malformed-element (syntax-error) ()
   (:documentation
-   "Syntax error describing a malformed object."))
+   "*Description:*
+
+    The _type_ {malformed-element} is an error condition of type
+    {syntax-error}. It occurs during parsing a _table_, _media_ or
+    _plaintext_ element.
+
+    *See Also:*
+
+    + syntax-error"))
 
 (define-condition section-not-closed (syntax-error) ()
   (:documentation
@@ -43,14 +90,29 @@
 
 (define-condition open-section (syntax-error) ()
   (:documentation
-   "Syntax error describing an open section."))
+   "*Description:*
+
+    The _type_ {open-section} is an error condition of type
+    {syntax-error}. It denotes an unclosed section.
+
+    *See Also:*
+
+    + syntax-error"))
 
 (define-condition unrecognized-input (syntax-error) ()
   (:documentation
-   "We don't know whats wrong. Should really never happen."))
+   "*Description:*
+
+    The _type_ {unrecognized-input} is an error condition of type
+    {syntax-error}. It denotes that a portion of the input could not be
+    interpreted as _Mk2_.
+
+    *See Also:*
+
+    + syntax-error"))
 
 
-;;; Error signaling routine
+;;; Error signaling routine.
 
 (defun =syntax-error (error)
   "Signal ERROR at current position."

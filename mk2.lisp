@@ -1,7 +1,7 @@
-;;;; Packages for the MK2 markup language.
+;;;; Package definitions for GENEVA-MK2.
 
 (defpackage geneva.mk2.tokens
-  (:documentation "Tokens used by the MK2 markup language.")
+  (:documentation "Tokens used by the _Mk2_ markup language.")
   (:use :cl)
   (:export :*section-start*
            :*section-end*
@@ -23,7 +23,8 @@
 
 (defpackage geneva.mk2
   (:documentation
-   "Read and print Geneva documents using the MK2 markup language..")
+   "Implementation of _Mk2_, a plain text markup language for the Geneva
+    document preparation system.")
   (:use :cl
         :geneva
         :geneva.mk2.tokens

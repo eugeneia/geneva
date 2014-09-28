@@ -1,7 +1,7 @@
-;;;; Render Geneva document as HTML.
+;;;; Render Geneva documents as HTML.
 
 (defpackage geneva.html
-  (:documentation "Render Geneva document as HTML.")
+  (:documentation "Render Geneva documents as HTML.")
   (:use :cl
 	:geneva
         :geneva.utilities
@@ -180,10 +180,23 @@ headlines."
                                   (index-headers-p *index-headers-p*)
                                   (header-level *header-level*)
                                   (id-prefix *id-prefix*))
-  "Render DOCUMENT as HTML to STREAM. If INDEX-HEADERS-P is _true_
-headlines are prefixed with a hierarchical index. ID-PREFIX is a string
-prepended to HTML ids and defaults to {\"geneva\"}. HEADER-LEVEL controls
-the initial headline level and defauls to 0."
+  "*Arguments and Values:*
+
+   _header-level_—an _unsigned integer_. The default is {0}.
+
+   _id-prefix_—a _string_. The default is {\"section\"}.
+
+   *Description:*
+
+   {render-html} renders _document_ as HTML. _header-level_ controls the
+   initial headline level. For instance a _header-level_ of {1} will
+   cause the top level headlines to be rendered as {H2} elements and so
+   forth. _Id-prefix_ is used as a prefix to {NAME} attribute values of
+   HTML anchor elements.
+
+    *See Also:*
+
+    + _Common Rendering Interface_ [open-geneva.html#section-3-1]"
   (let ((*standard-output* stream)
 	(*index-headers-p* index-headers-p)
         (*header-level* header-level)
@@ -213,7 +226,23 @@ the initial headline level and defauls to 0."
                               (index-headers-p *index-headers-p*)
                               stylesheets
                               (encoding :utf-8))
-  "Render DOCUMENT as stand-alone HTML file."
+  "*Arguments and Values:*
+
+   _stylesheets_—a _list_ of stylesheets applicable to
+   {macro-html.widgets:html-widget-document}.
+
+   _encoding_—a _keyword_ designating a valid character encoding
+   (defaults to {:utf-8}).
+
+   *Description:*
+
+   {render-html-file} renders _document_ as a standalone HTML file. The
+   resulting HTML file will use _stylesheets_ and declare its content to
+   be in _encoding_.
+
+    *See Also:*
+
+    + _Common Rendering Interface_ [open-geneva.html#section-3-1]"
   (let ((*standard-output* stream))
     (html-widget-document
      title

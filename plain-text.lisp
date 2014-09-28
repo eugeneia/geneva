@@ -1,7 +1,8 @@
-;;;; Render Geneva document as plain text.
+;;;; Render Geneva documents as plain text.
 
 (defpackage geneva.plain-text
-  (:documentation "Render Geneva document as plain text.")
+  (:documentation
+   "Render Geneva documents as plain text.")
   (:use :cl
 	:geneva
         :geneva.utilities
@@ -13,7 +14,7 @@
 ;;; This package is an ugly hack on top of GENEVA.MK2:PRINT-MK2 and uses
 ;;; many otherwise internal routines of the mk2 package. Assuming the mk2
 ;;; package is stable, this is a reasonable and *short* implemetation
-;;; despite bad code style.
+;;; despite its lack of style.
 
 (defmacro with-indent/mk2 ((indent) &body body)
   "Evaluate BODY with GENEVA.MK2::*INDENT* bound to INDENT."

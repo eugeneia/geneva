@@ -1,9 +1,9 @@
-;;;; Generate Geneva documents from Common Lisp inline documentation.
+;;;; Compile Geneva documents from Common Lisp on-line documentation.
 
 (defpackage geneva.common-lisp
   (:nicknames :geneva.cl)
   (:documentation
-   "Render a document from an API extracted by PACKAGE-API.")
+   "Compile a Geneva document from Common Lisp on-line documentation.")
   (:use :cl
         :named-readtables
 	:geneva
@@ -17,7 +17,7 @@
 (in-readtable geneva.macros:syntax)
 
 (defun name* (string-or-symbol)
-  "Canonicalize STRING-OR-SYMBOL to _string_."
+  "Canonicalize STRING-OR-SYMBOL to string."
   (etypecase string-or-symbol
     (symbol (name* (symbol-name string-or-symbol)))
     (string (if (find-if #'lower-case-p string-or-symbol)
@@ -49,7 +49,7 @@
           (write-to-string value))))))
 
 (defun render-variable (name variable-definition)
-  "Renders VARIABLE-DEFINITION with NAME."
+  "Render VARIABLE-DEFINITION with NAME."
   (destructuring-bind (&key kind documentation value)
       variable-definition
     (append (definition-template
@@ -82,7 +82,7 @@
          when (cdr head) collect " ")))
 
 (defun render-function (name function-definition)
-  "Renders FUNCTION-DEFINITION with NAME."
+  "Render FUNCTION-DEFINITION with NAME."
   (destructuring-bind (&key kind documentation lambda-list)
       function-definition
     (append (definition-template
@@ -107,7 +107,7 @@
     (render-lambda-list (list* '&key initargs))))
 
 (defun render-class (name class-definition)
-  "Renders CLASS-DEFINITION with NAME."
+  "Render CLASS-DEFINITION with NAME."
   (destructuring-bind (&key kind documentation precedence-list initargs)
       class-definition
     (declare (ignore kind))
@@ -120,7 +120,7 @@
      (docstring-document documentation))))
 
 (defun render-type (name type-definition)
-  "Renders TYPE-DEFINITION with NAME."
+  "Render TYPE-DEFINITION with NAME."
   (destructuring-bind (&key kind documentation)
       type-definition
     (append (definition-template
@@ -131,7 +131,7 @@
             (docstring-document documentation))))
 
 (defun render-definition (name definition)
-  "Renders DEFINITION for NAME."
+  "Render DEFINITION for NAME."
   (case (getf definition :kind)
     ((:variable :constant)
      (render-variable name definition))
@@ -143,7 +143,7 @@
      (render-type name definition))))
 
 (defun render-symbol-definitions (symbol definitions)
-  "Renders DEFINITIONS for SYMBOL."
+  "Render DEFINITIONS for SYMBOL."
   (let ((name (name* symbol)))
     (make-section (list name)
                   (loop for definition in definitions append
@@ -161,5 +161,12 @@
                                                    (cadr head)))))))
 
 (defun api-document (&rest packages)
-  "Render api document for PACKAGES."
+  "*Arguments and Values:*
+
+   _packages_—_packages_ or _string designators_ naming _packages_.
+
+   *Description:*
+
+   {api-document} renders the on-line documentation of _packages_ as a
+   Geneva document."
   (make-document (mapcar #'render-package packages)))

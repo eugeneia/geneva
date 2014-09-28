@@ -1,4 +1,4 @@
-;;;; System definition for the mk2 markup language.
+;;;; System definition for GENEVA-MK2.
 
 (defsystem geneva-mk2
   :description

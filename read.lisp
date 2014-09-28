@@ -3,5 +3,21 @@
 (in-package :geneva.mk2)
 
 (defun read-mk2 (&optional (input *standard-input*))
-  "Read MK2 document from INPUT."
+  "*Arguments and Values:*
+
+   _input_—a _string_ or _character stream_. The default in _standard
+   input_.
+
+   *Description:*
+
+   {read-mk2} reads an _Mk2_ file from INPUT and returns a _document_.
+
+   *Exceptional Situations:*
+
+   If _input_ is not a valid _Mk2_ file an _error_ of _type_
+   {syntax-error} is signaled.
+
+   *See Also:*
+
+   + syntax-error"
   (make-document (run (=document) input)))

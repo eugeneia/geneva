@@ -189,7 +189,22 @@ paragraph_."
 
 (defun render-tex (document &key (stream *standard-output*)
                                  (section-level *section-level*))
-  "Render Geneva DOCUMENT as TeX manuscript to STREAM."
+    "*Arguments and Values:*
+
+   _document_—a _Geneva document_.
+
+   _stream_—a _character stream_. The default is {*standard-output*}.
+
+   _section-level_—an _unsigned integer_. The default is {0}.
+
+   *Description:*
+
+   {render-tex} renders _document_ as a TeX manuscript to _stream_. The
+   sections will be rendered at _section level_.
+
+   *See Also:*
+
+   + geneva.latex:render-latex"
   (let ((*standard-output* stream)
 	(*section-level* section-level))
     (render-contents document)))

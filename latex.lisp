@@ -1,8 +1,8 @@
-;;;; Render Geneva document as LaTeX manuscript.
+;;;; Render Geneva documents as LaTeX manuscripts.
 
 (defpackage geneva.latex
   (:documentation
-   "Render Geneva document as LaTeX manuscript.")
+   "Render Geneva documents as LaTeX manuscripts.")
   (:use :cl
 	:named-readtables
 	:texp
@@ -135,7 +135,26 @@
                           (index-headers-p *index-headers-p*)
                           (preamble #'default-preamble)
                           appendix)
-  "Render Geneva document as LaTeX manuscript."
+  "*Arguments and Values:*
+
+   _preamble_—a _function_ without arguments that prints LaTeX
+   expressions to {*standard-output*}. The produced LaTeX expressions
+   will be inserted at the beginning of the LaTeX manuscript.
+
+   _appendix_—a _function_ without arguments that prints LaTeX
+   expressions to {*standard-output*}. The produced LaTeX expressions
+   will be appended to the LaTeX manuscript.
+
+   *Description:*
+
+   {render-latex} renders _document_ as a LaTeX manuscript.  _Preamble_
+   and _appendix_ may be supplied to customize the LaTeX layout and
+   functionality. Their output will be inserted at the beginning or
+   appended to the end of the LaTeX manuscript respectively.
+
+   *See Also:*
+
+    + _Common Rendering Interface_ [open-geneva.html#section-3-1]"
   (let ((*standard-output* stream)
         (*index-headers-p* index-headers-p))
     (document-implementation)
