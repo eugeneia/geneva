@@ -178,16 +178,16 @@ headlines."
                                   (index-p *index-p*)
                                   (index-caption *default-index-caption*)
                                   (index-headers-p *index-headers-p*)
-                                  (id-prefix *id-prefix*)
-                                  (header-level *header-level*))
+                                  (header-level *header-level*)
+                                  (id-prefix *id-prefix*))
   "Render DOCUMENT as HTML to STREAM. If INDEX-HEADERS-P is _true_
 headlines are prefixed with a hierarchical index. ID-PREFIX is a string
 prepended to HTML ids and defaults to {\"geneva\"}. HEADER-LEVEL controls
 the initial headline level and defauls to 0."
   (let ((*standard-output* stream)
 	(*index-headers-p* index-headers-p)
-        (*id-prefix* id-prefix)
-	(*header-level* header-level))
+        (*header-level* header-level)
+        (*id-prefix* id-prefix))
     (when (or title author date)
       (header (when title
                 (render-title title)
@@ -212,7 +212,6 @@ the initial headline level and defauls to 0."
                               (index-p *index-p*)
                               (index-caption *default-index-caption*)
                               (index-headers-p *index-headers-p*)
-                              (id-prefix *id-prefix*)
                               stylesheets
                               (encoding :utf-8))
   "Render DOCUMENT as stand-alone HTML file."
