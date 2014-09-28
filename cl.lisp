@@ -42,7 +42,11 @@
         (*print-readably* t)
         (*print-escape* t)
         (*print-miser-width* *print-right-margin*))
-    (write-to-string value)))
+    (handler-case (write-to-string value)
+      (print-not-readable (c)
+        (declare (ignore c))
+        (let ((*print-readably* nil))
+          (write-to-string value))))))
 
 (defun render-variable (name variable-definition)
   "Renders VARIABLE-DEFINITION with NAME."
