@@ -69,12 +69,14 @@
     (render-text-token text-token))
   (values))
 
+(defun text-length (text)
+  "Number of characters in TEXT."
+  (loop for token in text sum (length (content-values token))))
+
 (defun tiny-paragraph-p (paragraph)
-  "If PARAGRAPH contains less than 60 characters its a _tiny paragraph_."
-  (< (loop for token in (content-values paragraph)
-        if (stringp token) sum (length token)
-        else sum (length (content-values token)))
-     60))
+  "If PARAGRAPH contains less than 128 characters its a _tiny
+paragraph_."
+  (< (text-length (content-values paragraph)) 128))
 
 (defun render-paragraph (paragraph)
   "Render PARAGRAPH in TeX representation."
