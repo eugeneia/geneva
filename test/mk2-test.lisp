@@ -16,9 +16,6 @@
 
 (in-package :geneva.mk2-test)
 
-(defparameter *character-range* 256
-  "Range for random character values.")
-
 (defparameter *test-iterations* 8
   "Number of test iterations. Due to sections, this variable will
 increase the runtime of TEST-MK2 exponentially.")
