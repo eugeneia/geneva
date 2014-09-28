@@ -41,7 +41,7 @@
 (defun latex-figure ()
   "Figure implementation for LaTeX."
   (deftex genfigure (description content)
-    (begin {figure} [h!])
+    (begin {figure} ["H"])
     (centering)
     ($ content)
     (caption {($ description)})
@@ -75,7 +75,7 @@
 (defun latex-text-figure ()
   "Text figure implementation for LaTeX."
   (deftex genverbatimstart ()
-    (begin {figure} [h!])
+    (begin {figure} ["H"])
     (begin {quote})
     (begin {alltt}))
   (deftex genverbatimend ()
@@ -120,6 +120,7 @@
   (tex (documentclass {article})
        (usepackage {graphicx})
        (usepackage {alltt})
+       (usepackage {float})
        (usepackage [hyphens] {url})))
 
 (defun render-latex (document
