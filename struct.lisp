@@ -154,7 +154,10 @@ DESCRIPTION is a valid rich text sequence."
 
    {make-document} returns a _document_ consisting of _elements_."
   (loop for thing in elements do (assert-element thing))
-  (remove '(:paragraph nil) elements :test #'equal))
+  (remove-if (lambda (element)
+               (member element '((:paragraph nil) (:list nil))
+                       :test #'equal))
+             elements))
 
 (defun make-section (header elements)
   "*Arguments and Values:*
