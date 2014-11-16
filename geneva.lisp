@@ -17,7 +17,7 @@
     {make-url}.
 
     _Document elements_ and _text tokens_ can be inspected using the
-    accessors {content-type} and {content-values}.
+    readers {content-type} and {content-values}.
 
     _Documents_ and _document elements_ are printable and readable using
     the Common Lisp printer and reader.

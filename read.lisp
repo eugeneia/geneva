@@ -5,7 +5,7 @@
 (defun read-mk2 (&optional (input *standard-input*))
   "*Arguments and Values:*
 
-   _input_—a _string_ or _character stream_. The default in _standard
+   _input_—a _string_ or _character stream_. The default is _standard
    input_.
 
    *Description:*

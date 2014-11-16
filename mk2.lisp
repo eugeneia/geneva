@@ -23,8 +23,10 @@
 
 (defpackage geneva.mk2
   (:documentation
-   "Implementation of _Mk2_, a plain text markup language for the Geneva
-    document preparation system.")
+   "Implementation of _Mk2_¹, a plain text markup language for the Geneva
+    document preparation system.
+
+    + 1. _The Mk2 Markup Language_ [mk2.html]")
   (:use :cl
         :geneva
         :geneva.mk2.tokens
