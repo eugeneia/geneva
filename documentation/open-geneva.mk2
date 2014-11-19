@@ -1,0 +1,221 @@
+_Open Geneva_ is an implementation of the _Geneva document preparation
+system_ written in _Common Lisp_. This user manual describes the
+components of Open Geneva from a high level perspective and explains
+their operation by example. For a complete API documentation see the
+_Open Geneva API_¹.
+
+Open Geneva is divided into several subsystems, each implementing a
+different functionality of the system. For convenience, a "master system"
+is provided, which depends on every subsystem of Open Geneva. If you want
+to load and/or compile Open Geneva as a whole, then you may use the
+{open-geneva} system. The various subsystems are described in the
+sections below.
+
++ 1. _Open Geneva API_ [open-geneva-api.html]
+
+
+< Geneva: The Document API
+
+ At the core of Open Geneva are a set of constructors and readers used to
+ programatically create and inspect Geneva documents. These functions are
+ in the {geneva} package. These constructors verify the integrity of
+ their arguments and their return values are normalized as defined in the
+ _Geneva Document Specification_¹.
+
+ There are three different kinds of constructors: The _document_
+ constructor {make-document}, _document element_ constructors
+ ({make-pargraph} for instance) and _text token_ constructors
+ ({make-bold} etc.).
+
+ #code Example: Dynamically creating a document.#
+ (defun make-birthday-invitation (date guest-name)
+   (make-document
+    (list
+     (make-section
+       '("Birthday Invitation")
+      (list
+       (make-paragraph
+        `(,(make-bold (format nil "Hi ~a!" guest-name))))
+       (make-paragraph
+        `(,(format nil "You are invited to my birthday party on ~a. "
+                   date)
+          ,(make-italic "Bring your friends!"))))))))
+
+ (make-birthday-invitation "Friday" "John") → document
+ #
+
+ The readers {content-type} and {content-values} work on document
+ elements as well as on text tokens and can be used to inspect the
+ contents of a document. {Content-type} returns the type of its argument
+ and {content-values} returns the components of it argument a seperate
+ values.
+
+ #code Examples: Inspecting document contents.#
+ (content-type (make-bold "foo")) → :BOLD
+ (content-type "bar") → :PLAIN ; Strings have a CONTENT-TYPE.
+ (content-values (make-section <title> <body)) → <title> <body>
+ #
+
+ A document is just a list of document elements. It can be traversed by
+ the standard list manipulation functions.
+
+ #code Example: Traversing a document.#
+ ;; Return list of element types used in document.
+ (defun document-features (document)
+   (remove-duplicates
+    (loop for element in <document>
+          for type = (content-type element)
+      if (eq type :section)
+      then append (multiple-value-bind (title body)
+                     (content-values element)
+                   `(:section ,@(document-features body)))
+      else collect (content-type element))))
+
+ (document-features (make-document
+                     (make-paragraph '("foo"))
+                     (make-paragraph '("bar")))
+   → (:PARAGRAPH)
+ #
+   
+ A document can be printed _readably_ by the Common Lisp printer. The
+ easiest way to (de)serialize a document is to use {read} and {print}.
+
+ #code Example: (De)serializing a document.#
+ (let ((document (make-document ...)))
+   (equal document
+          (read-from-string
+           (prin1-to-string document))))
+   → T
+ #
+
+ The package {geneva.macros} provides macro counterparts of the element
+ constructors and a readtable² {geneva.macros:syntax} which can come in
+ handy when dynamically creating documents. Below is the "birthday
+ invitation" example from above revisited using {geneva.macros}.
+
+ #code Example: Dynamically creating documents using {geneva.macros}.#
+ (in-readtable geneva.macros:syntax)
+
+ (defun make-birthday-invitation (date guest-name)
+   (document
+    (section ("Birthday invitation")
+      (paragraph (make-bold (format nil "Hi ~a!" guest-name)))
+      (paragraph
+       (format nil "You are invited to my birthday party on ~a. "
+               date)
+       ;; Note the reader macro below.
+       #i"Bring your friends!"))))
+ #
+
+ + 1. _Geneva Document Specification_ [geneva-document.html]
+ + 2. See _Named-Readtables_ ({editor-hints.named-readtables})
+
+>
+
+
+< Geneva-mk2: Reading and Writing Mk2 Files
+
+ _Mk2_¹ is a human readable serialization format for Geneva documents.
+ Open Geneva implements the Mk2 markup language in the {geneva.mk2}
+ package. Geneva documents can be read from and printed as Mk2 using
+ {read-mk2} and {print-mk2}.
+
+ Note that an Mk2 file is a precise representation of a Geneva
+ document. The following holds true:
+
+ #code#
+ (let ((document (make-document ...)))
+   (equal document
+          (read-mk2 (with-output-to-string (out)
+                      (print-mk2 document out)))))
+   → T
+ #
+
+ + 1. _The Mk2 Markup Language_ [mk2.html]
+
+>
+
+
+< Rendering Geneva Documents
+
+ Open Geneva supports rendering Geneva documents as plain text, HTML and
+ LaTeX. The implementing functions can be loaded as the
+ {geneva-plaintext}, {geneva-html} and {geneva-latex} systems
+ respectively.
+
+ < Common Rendering Interface
+
+  The various rendering systems share a common subset of their interface.
+
+  — Function: *render-plain-text* | *render-html* | *render-latex*
+               _document_
+               {&key} _stream_ _title_ _author_ _date_ _index-p_
+                      _index-caption_ _index-headers-p_
+               {&allow-other-keys}
+
+  *Arguments and Values:*
+
+  _document_—a Geneva _document_.
+
+  _stream_—a _character stream_. The default is _standard output_.
+
+  _title_—a _string_.
+
+  _author_—a _string_.
+
+  _date_—a _string_.  
+  
+  _index-p_—a _generalized boolean_. The default is _true_.
+
+  _index-caption_—a _string_. The default is {"Table of Contents"}.
+
+  _index-headers-p_—a _generalized boolean_. The default is _true_.
+
+  *Description:*
+
+  Renders _document_ to _stream_. The document rendering can optionally
+  be prepended by a title section and a section index. _Title_, _author_
+  and _date_ are used in the title section. _Index-caption_ can be
+  supplied to customize the heading of the section index. If _index-p_ is
+  _false_ the section index will be omitted. Section headers will be
+  enumerated unless _index-headers-p_ is _false_.
+
+  *Exceptional Situations:*
+
+  If _document_ is not a valid Geneva _document_ an _error_ of _type_
+  {type-error} is signaled.
+
+ >
+
+>
+
+
+< Geneva-cl: Compiling Geneva Documents from Common Lisp On-Line
+  Documentation
+
+ The {geneva.common-lisp} provides a function {api-document} which can be
+ used to compile Geneva documents from Common Lisp on-line
+ documentation. Its usage is quite simple and can be explained by
+ example:
+
+ #code Creating an API document from a package.#
+ (defpackage foo
+   (:documentation "Foo is a demo package.")
+   (:use :cl)
+   (:export :bar))
+
+ (defun foo:bar (x) "{bar} is a _NO-OP_." x)
+
+ (api-document :foo)
+  → ((:SECTION ("foo")
+      ((:PARAGRAPH ("Foo is a demo package."))
+       (:SECTION ("bar")
+        ((:PARAGRAPH ("— Function: " (:BOLD "bar") " " (:ITALIC "x")))
+         (:PARAGRAPH ((:FIXED-WIDTH "bar") " is a "
+                      (:ITALIC "NO-OP") ".")))))))
+ #
+
+ Note that documentation strings are parsed as _Mk2_ files using
+ {read-mk2}.
+
+>
