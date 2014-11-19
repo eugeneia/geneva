@@ -204,6 +204,11 @@ hack!")
    {print-mk2} attempts to produce lines no longer than _comlums_ in its
    output.
 
+   *Exceptional Situations:*
+
+   If _document_ is not a valid Geneva _document_ an _error_ of _type_
+   {type-error} is signaled.
+
    *See Also:*
 
     + _The Mk2 markup language_ [mk2.html]"

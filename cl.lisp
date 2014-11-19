@@ -3,7 +3,7 @@
 (defpackage geneva.common-lisp
   (:nicknames :geneva.cl)
   (:documentation
-   "Compile a Geneva document from Common Lisp on-line documentation.")
+   "Compile a Geneva _document_ from Common Lisp on-line documentation.")
   (:use :cl
         :named-readtables
 	:geneva
@@ -167,6 +167,6 @@
 
    *Description:*
 
-   {api-document} renders the on-line documentation of _packages_ as a
-   Geneva document."
+   {api-document} renders the on-line documentation for the _external
+   symbols_ of _packages_ as a Geneva document."
   (make-document (mapcar #'render-package packages)))

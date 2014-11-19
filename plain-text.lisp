@@ -12,7 +12,7 @@
 (in-package :geneva.plain-text)
 
 ;;; This package is an ugly hack on top of GENEVA.MK2:PRINT-MK2 and uses
-;;; many otherwise internal routines of the mk2 package. Assuming the mk2
+;;; many otherwise internal routines of the Mk2 package. Assuming the Mk2
 ;;; package is stable, this is a reasonable and *short* implemetation
 ;;; despite its lack of style.
 
@@ -22,7 +22,7 @@
      ,@body))
 
 (defmacro with-no-escape/mk2 (&body body)
-  "Disable mk2 escaping for BODY."
+  "Disable Mk2 escaping for BODY."
   `(let ((geneva.mk2::*to-escape* nil))
      ,@body))
 
@@ -105,7 +105,7 @@ GENEVA.MK2."
                       (incf-level level)))))))
 
 (defun render-index/mk2 (index &optional (indent "   "))
-  "Render INDEX as plain text using interal mk2 functions."
+  "Render INDEX as plain text using interal Mk2 functions."
   (flet ((indent-string (n) (make-string n :initial-element #\Space)))
     (loop for (level header subsections) in index
        do (let ((prefix
