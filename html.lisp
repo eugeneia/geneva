@@ -218,7 +218,7 @@ headlines."
 
 (defun render-html-file (document
                          &key (stream *standard-output*)
-                              (title *default-title*)
+                              title
                               author
                               date
                               (index-p *index-p*)

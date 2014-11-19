@@ -5,8 +5,7 @@
    "Shared utility functions used by various components of Geneva.")
   (:use :geneva
         :cl)
-  (:export :*default-title*
-           :*default-index-caption*
+  (:export :*default-index-caption*
            :*index-p*
            :*index-headers-p*
            :null-level
@@ -17,9 +16,6 @@
            :document-index))
 
 (in-package :geneva.utilities)
-
-(defparameter *default-title* "Untitled"
-  "Default title for documents.")
 
 (defparameter *default-index-caption* "Table of Contents"
   "Default caption for indexes.")
