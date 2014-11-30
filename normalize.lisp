@@ -47,7 +47,7 @@
     (:plain
      (normalize-whitespace #2=(content-values item) :trim trim))
     ((:bold :italic :fixed-width :url)
-     (list #1# (normalize-whitespace #2# :trim trim)))))
+     (list #1# (normalize-whitespace #2# :trim :both)))))
 
 (defun position-non-whitespace-item (text &optional from-end)
   "Get position of first non-whitespace item in TEXT and maybe start
