@@ -5,7 +5,7 @@ _Mk2_ is a human readable plain text language for expressing Geneva
 documents.¹ It is designed with both ergonomics and technical pragmatism
 in mind.
 
-+ 1. [geneva-document.html]
++ 1. [Geneva Document Specification](geneva-document.html)
 
 
 < Syntax
@@ -25,7 +25,7 @@ in mind.
  _SP_—A whitespace character. The exact set of characters considered
  whitespace is platform dependent.
 
- + 1. [http://users-phys.au.dk/harder/Notational-Conventions.html]
+ + 1. [ANSI Common Lisp: Notational Conventions](http://users-phys.au.dk/harder/Notational-Conventions.html)
 
  < Document and Section
 
@@ -36,7 +36,7 @@ in mind.
   | title          | rich-text
   | element        | section {|} table {|} plaintext {|} media {|} listing {|} paragraph
   | separator      | double-lf {|} _EOF_
-  | double-lf | _LF_ {[} _LF_  {]}{+}
+  | double-lf      | _LF_ {[} _LF_  {]}{+}
 
  >
 
@@ -84,7 +84,7 @@ in mind.
   | bold        | {"*"} _String_ {"*"}
   | italic      | {"_"} _String_ {"_"}
   | fixed-width | {"{"} _String_ {"\}"}
-  | url         | {"["} _String_ {"]"}
+  | url         | {"["} _String_ {"]"} {[} {"("} _String_ {")"} {]}
   | plain       | _String_
 
  >
@@ -154,6 +154,7 @@ in mind.
   + _Italic text token_
   + {Fixed-width text token}
   + [http://example.org/url/text-token]
+  + [Labeled URL](http://example.org)
   #
 
  >

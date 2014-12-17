@@ -32,7 +32,8 @@
       (:bold (b #1#))
       (:italic (i #1#))
       (:fixed-width (code #1#))
-      (:url (a [:href #1#] #1#)))))
+      (:url (multiple-value-bind (string url) #1#
+              (a [:href (or url string)] (or string url)))))))
 
 (defun render-paragraph (paragraph)
   "Render PARAGRAPH as HTML."

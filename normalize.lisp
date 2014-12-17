@@ -46,8 +46,13 @@
   (ecase #1=(content-type item)
     (:plain
      (normalize-whitespace #2=(content-values item) :trim trim))
-    ((:bold :italic :fixed-width :url)
-     (list #1# (normalize-whitespace #2# :trim :both)))))
+    ((:bold :italic :fixed-width)
+     (list #1# (normalize-whitespace #2# :trim :both)))
+    (:url
+     (multiple-value-bind (string url) #2#
+       `(,#1# ,(normalize-whitespace string :trim :both)
+              ,@(when url
+                  `(,(normalize-whitespace url :trim :both))))))))
 
 (defun position-non-whitespace-item (text &optional from-end)
   "Get position of first non-whitespace item in TEXT and maybe start

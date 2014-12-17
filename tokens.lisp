@@ -22,9 +22,13 @@
 (defparameter *fixed-width-directive-end*
   #\} "Fixed-Width directive end character.")
 (defparameter *url-directive-start*
-  #\[ "Url directive start character.")
+  #\[ "URL directive start character.")
 (defparameter *url-directive-end*
-  #\] "Url directive end character.")
+  #\] "URL directive end character.")
+(defparameter *url-url-start*
+  #\( "URL url start character.")
+(defparameter *url-url-end*
+  #\) "URL url end character.")
 (defparameter *escape-directive*
   #\\ "Escape directive character.")
 
@@ -41,7 +45,9 @@
 					*fixed-width-directive-start*
 					*fixed-width-directive-end*
 					*url-directive-start*
-					*url-directive-end*)
+					*url-directive-end*
+                                        *url-url-start*
+                                        *url-url-end*)
   "Markup directives.")
 
 

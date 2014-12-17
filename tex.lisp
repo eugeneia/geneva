@@ -61,7 +61,14 @@
     (:bold        (tex (genbold       {($ #1#)})))
     (:italic      (tex (genitalic     {($ #1#)})))
     (:fixed-width (tex (genfixedwidth {($ #1#)})))
-    (:url         (tex (genurl        {($ #1#)})))))
+    (:url         (multiple-value-bind (string url)
+                      (content-values text-token)
+                    (if url
+                        (tex (genitalic {($ (escape string))})
+                             " ("
+                             (genurl    {($ (escape url))})
+                             ")")
+                        (tex (genurl    {($ (escape string))})))))))
 
 (defun render-text (text)
   "Render TEXT in TeX representation."

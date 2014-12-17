@@ -25,6 +25,15 @@
           (_ (=token end)))
     (=result (funcall constructor text))))
 
+(defun =url-text ()
+  (=let* ((x (=markup% #'identity
+                       *url-directive-start*
+                       *url-directive-end*))
+          (y (=maybe (=markup% #'identity
+                               #\(
+                               #\)))))
+    (=result (make-url x y))))
+
 (defun =markup ()
   (=or (=markup% #'make-bold
                  *bold-directive*)
@@ -33,9 +42,7 @@
        (=markup% #'make-fixed-width
                  *fixed-width-directive-start*
                  *fixed-width-directive-end*)
-       (=markup% #'make-url
-                 *url-directive-start*
-                 *url-directive-end*)))
+       (=url-text)))
 
 (defun =markup-directive ()
   (=one-of *markup-directives*))
