@@ -77,7 +77,10 @@
                    (:bold "are you"))))
   (assert (equal (geneva::normalize-text
                   '("" (:italic " ") " f " (:bold " ") ""))
-                 '("f"))))
+                 '("f")))
+  (assert (equal (geneva::normalize-text
+                  '("foo " :break " bar"))
+                  '("foo" :break "bar"))))
 
 (defun test-normalize-plaintext ()
   "Test NORMALIZE-PLAINTEXT."

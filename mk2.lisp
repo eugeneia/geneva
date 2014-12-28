@@ -14,6 +14,7 @@
            :*fixed-width-directive-end* 
            :*url-directive-start*
            :*url-directive-end*
+           :*break-directive*
            :*escape-directive*
            :*special-tokens*
            :*markup-directives*

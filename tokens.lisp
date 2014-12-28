@@ -29,6 +29,8 @@
   #\( "URL url start character.")
 (defparameter *url-url-end*
   #\) "URL url end character.")
+(defparameter *break-directive*
+  #\$ "Break directive character.")
 (defparameter *escape-directive*
   #\\ "Escape directive character.")
 
@@ -36,6 +38,7 @@
 				     *section-end*
 				     *listing-item*
 				     *table-item*
+                                     *break-directive*
 				     *object-delimiter*
 				     *escape-directive*)
   "Special tokens.")
@@ -47,7 +50,8 @@
 					*url-directive-start*
 					*url-directive-end*
                                         *url-url-start*
-                                        *url-url-end*)
+                                        *url-url-end*
+                                        *break-directive*)
   "Markup directives.")
 
 

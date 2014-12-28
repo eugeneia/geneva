@@ -28,7 +28,7 @@
   "Template for common definition formatting."
   (document
    (make-paragraph
-    `("— " ,kind-string ": " ,(make-bold name) " " ,@text))))
+    `("— " ,kind-string ": " ,(make-bold name) " " ,@text :break))))
 
 (defun docstring-document (docstring)
   "Compile document from DOCSTRING."

@@ -67,7 +67,8 @@ increase the runtime of TEST-MK2 exponentially.")
             (make-italic random-string)
             (make-fixed-width random-string)
             (make-url random-string)
-            (make-url random-string random-string))))
+            (make-url random-string random-string)
+            (make-break))))
 
 (defun random-text ()
   "Generate random text."

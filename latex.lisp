@@ -21,7 +21,7 @@
   (deftex genfixedwidth (text) (texttt {($ text)}))
   (deftex genurl        (text) (url    {($ text)}))
 
-  (deftex gentinyparagraph (text)
+  (deftex genformattedparagraph (text)
     (medskip)
     (br)
     (noindent)

@@ -44,12 +44,19 @@
                  *fixed-width-directive-end*)
        (=url-text)))
 
+(defun =break ()
+  (=and (=zero-or-more (=unless (=newline) (=whitespace)))
+        (=token *break-directive*)
+        (=newline)
+        (=result :break)))
+
 (defun =markup-directive ()
   (=one-of *markup-directives*))
 
 (defun =text (until)
   (=zero-or-more
    (=or (=markup)
+        (=break)
         (=plain-text (=or (=markup-directive)
                           until)))))
 

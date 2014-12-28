@@ -52,14 +52,17 @@
      (multiple-value-bind (string url) #2#
        `(,#1# ,(normalize-whitespace string :trim :both)
               ,@(when url
-                  `(,(normalize-whitespace url :trim :both))))))))
+                  `(,(normalize-whitespace url :trim :both))))))
+    (:break item)))
 
 (defun position-non-whitespace-item (text &optional from-end)
   "Get position of first non-whitespace item in TEXT and maybe start
 FROM-END."
   (labels ((whitespace-p (c) (member c *whitespace*))
            (whitespace-item-p (item)
-             (not (find-if-not #'whitespace-p (content-values item)))))
+             (unless (eq item :break)
+               (not (find-if-not #'whitespace-p
+                                 (content-values item))))))
     (position-if-not #'whitespace-item-p text :from-end from-end)))
 
 (defun trim-whitespace-items (text)
@@ -99,12 +102,16 @@ FROM-END."
 (defun normalize-text (text)
   "Remove empty markup and join adjacent strings in TEXT, then remove
 superfluous whitespace."
-  (remove ""
-          (normalize-text-whitespace
-           (trim-whitespace-items
-            (join-strings
-             (remove-empty-markup text))))
-          :test #'equal))
+  (loop for head = (split-sequence :break text) then (cdr head)
+        for line = (car head)
+     while head append
+       (remove ""
+               (normalize-text-whitespace
+                (trim-whitespace-items
+                 (join-strings
+                  (remove-empty-markup line))))
+               :test #'equal)
+     when (cdr head) collect :break))
 
 (defun trim-whitespace-suffixes (lines)
   "Trim whitespace suffixes from LINE."

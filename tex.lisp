@@ -6,8 +6,8 @@
 ;;; \genbold{#1} \genitalic{#1} \genfixedwidth{#1} \genurl{#1}
 ;;; E.g.: \genbold{...} ...
 ;;;
-;;; \gentinyparagraph{#1} (For very short paragraphs)
-;;;; E.g. \gentinyparagraph{...} 
+;;; \genformattedparagraph{#1} (For very short paragraphs)
+;;;; E.g. \genformattedparagraph{...} 
 ;;;
 ;;; Listing:
 ;;; \genlisting{#1} \genitem{#1}
@@ -68,7 +68,8 @@
                              " ("
                              (genurl    {($ (escape url))})
                              ")")
-                        (tex (genurl    {($ (escape string))})))))))
+                        (tex (genurl    {($ (escape string))})))))
+    (:break       (tex (\\)))))
 
 (defun render-text (text)
   "Render TEXT in TeX representation."
@@ -80,15 +81,14 @@
   "Number of characters in TEXT."
   (loop for token in text sum (length (content-values token))))
 
-(defun tiny-paragraph-p (paragraph)
-  "If PARAGRAPH contains less than 128 characters its a _tiny
-paragraph_."
-  (< (text-length (content-values paragraph)) 128))
+(defun formatted-paragraph-p (paragraph)
+  "If PARAGRAPH contains a :BREAK its a formatted paragraph."
+  (not (null (find :break (content-values paragraph)))))
 
 (defun render-paragraph (paragraph)
   "Render PARAGRAPH in TeX representation."
-  (if (tiny-paragraph-p paragraph)
-      (tex (gentinyparagraph
+  (if (formatted-paragraph-p paragraph)
+      (tex (genformattedparagraph
             {($ (render-text (content-values paragraph)))}))
       (tex ($ (render-text (content-values paragraph)))
            (br))))

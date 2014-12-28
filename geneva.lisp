@@ -43,6 +43,7 @@
 	   :make-italic
 	   :make-fixed-width
 	   :make-url
+           :make-break
            :make-document
 	   :content-type
 	   :content-values))

@@ -55,12 +55,17 @@ not of type string."
       (make-markup :url string url)
       (make-markup :url string)))
 
+(defun make-break ()
+  ""
+  :break)
+
 (defun assert-text-token (thing)
   "Assert that THING is a valid text token. On failure signal a
 TYPE-ERROR."
   (etypecase thing
     (list (check-type (first thing)
                       (member :bold :italic :fixed-width :url)))
+    (symbol (eq thing :break))
     (string)))
 
 (defun assert-rich-text (thing)
@@ -186,6 +191,7 @@ a TYPE-ERROR."
                       (member :paragraph :listing :table
                               :plaintext :media :section
                               :bold :italic :fixed-width :url)))
+    (symbol (check-type thing (member :break)))
     (string)))
 
 (defun content-type (content)
@@ -202,6 +208,7 @@ a TYPE-ERROR."
   (assert-content content)
   (typecase content
     (list (first content))
+    (symbol content)
     (string :plain)))
 
 (defun content-values (content)
@@ -218,4 +225,5 @@ a TYPE-ERROR."
   (assert-content content)
   (typecase content
     (list (apply #'values (rest content)))
+    (symbol content)
     (string content)))

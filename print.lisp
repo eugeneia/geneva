@@ -84,7 +84,11 @@ hack!")
                              (format nil "~a~@[ (~a)~]"
                                      (escape string)
                                      (escape url)))
-                           (markup-string text-token))))))))
+                           (markup-string text-token)))
+                      (:break
+                       (if *discard-text-markup-p*
+                           (format nil "~%")
+                           (format nil "~a~%" *break-directive*))))))))
 
 (defun listing-string (items &optional (bullet "+ "))
   "Return listing string for ITEMS using BULLET."
