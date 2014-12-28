@@ -83,7 +83,7 @@ hack!")
                            (multiple-value-bind (string url) #1#
                              (format nil "~a~@[ (~a)~]"
                                      (escape string)
-                                     (escape url)))
+                                     (and url (escape url))))
                            (markup-string text-token))))))))
 
 (defun listing-string (items &optional (bullet "+ "))
