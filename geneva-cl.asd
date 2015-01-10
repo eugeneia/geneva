@@ -8,6 +8,7 @@
   :license "GNU AGPL"
   :components ((:file "cl"))
   :depends-on ("named-readtables"
+               "split-sequence"
                "geneva"
                "geneva-mk2"
                "trivial-documentation"))

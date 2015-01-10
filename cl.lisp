@@ -9,8 +9,10 @@
 	:geneva
         :geneva.mk2
         :geneva.macros
+        :split-sequence
         :trivial-documentation)
-  (:export :api-document))
+  (:export :api-document
+           :symbol-document))
 
 (in-package :geneva.common-lisp)
 
@@ -30,10 +32,23 @@
    (make-paragraph
     `("— " ,kind-string ": " ,(make-bold name) " " ,@text))))
 
+
+(defun docstring-paragraphs (docstring)
+  "Split DOCSTRING into Geneva paragraphs."
+  ;; This is a haskish approach. Deal with it.
+  (mapcar (lambda (p) (paragraph (format nil "~{~a~%~}" p)))
+          (split-sequence "" (split-sequence #\Newline docstring)
+                          :test 'equal)))
+
 (defun docstring-document (docstring)
   "Compile document from DOCSTRING."
   (when docstring
-    (read-mk2 docstring)))
+    ;; Try parsing DOCSTRING as Mk2.
+    (handler-case (read-mk2 docstring)
+      (error (e)
+        (declare (ignore e))
+        ;; If that fails, fall back to basic paragraph formatting.
+        (make-document (docstring-paragraphs docstring))))))
 
 (defun value-string (value)
   "Return pretty string for VALUE."
@@ -170,3 +185,18 @@
    {api-document} renders the on-line documentation for the _external
    symbols_ of _packages_ as a Geneva document."
   (make-document (mapcar #'render-package packages)))
+
+(defun symbol-document (symbol)
+  "*Arguments and Values:*
+
+   _symbol_—a _symbol_.
+
+   *Description:*
+
+   {symbol-document} renders the on-line documentation for _symbol_ as a
+   Geneva document."
+  (multiple-value-bind (header definitions)
+      (content-values (render-symbol-definitions
+                       symbol (symbol-definitions symbol)))
+    (declare (ignore header))
+    (make-document definitions)))
