@@ -19,9 +19,14 @@
   (=unless (=escaped-char)
            (=character char)))
 
+(defun =double-newline ()
+  (=and (=newline*)
+        (=newline*)))
+
 (defun =markup% (constructor start &optional (end start))
   (=let* ((_ (=token start))
-          (text (=or (=plain-text (=token end)) (=result "")))
+          (text (=or (=plain-text (=or (=token end) (=double-newline)))
+                     (=result "")))
           (_ (=token end)))
     (=result (funcall constructor text))))
 
@@ -59,10 +64,6 @@
 (defun =newline* ()
   (=and (=zero-or-more (=unless (=newline) (=whitespace)))
         (=newline)))
-
-(defun =double-newline ()
-  (=and (=newline*)
-        (=newline*)))
 
 (defun =end-of-document ()
   (=skip-whitespace (=end-of-input)))
