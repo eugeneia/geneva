@@ -20,9 +20,9 @@ including web, print and plain text media.
 
 < Documentation
 
- + Geneva document specification [geneva-document.html]
- + Open Geneva manual [open-geneva.html]
- + Mk2 markup language specification [mk2.html]
+ + [Geneva Document Specification](geneva-document.html)
+ + [Open Geneva Manual](open-geneva.html)
+ + [The Mk2 Markup](mk2.html)
 
 >
 
@@ -30,8 +30,8 @@ including web, print and plain text media.
 < Getting the Source
 
  The official upstream source is [geneva.git]. Use Git to get your
- copy. For public development the repository is mirrored at GitHub
- ([https://github.com/interstellar/geneva]).
+ copy. For public development the repository is mirrored at
+ [GitHub](https://github.com/interstellar/geneva).
 
  You can get support and services regarding Geneva from Interstellar
  <[mailto:service@interstellar.ventures]\>.

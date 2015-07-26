@@ -54,6 +54,14 @@
 (defvar *section-level* 0
   "Section level.")
 
+(defun render-url (url)
+  (flet ((break-p (c) (member c '(#\/ #\? #\= #\& #\#))))
+    (with-output-to-string (*standard-output*)
+      (loop for start = 0 then (1+ end)
+            for end = (position-if #'break-p url :start start)
+         do (write-string (escape (subseq url start (if end (1+ end)))))
+         while end do (tex (allowbreak ""))))))
+
 (defun render-text-token (text-token)
   "Render TEXT-TOKEN as TeX using macro calls for markup tokens."
   (ecase (content-type text-token)
@@ -61,7 +69,12 @@
     (:bold        (tex (genbold       {($ #1#)})))
     (:italic      (tex (genitalic     {($ #1#)})))
     (:fixed-width (tex (genfixedwidth {($ #1#)})))
-    (:url         (tex (genurl        {($ #1#)})))))
+    (:url         (multiple-value-bind (string url)
+                      (content-values text-token)
+                    (if url
+                        (tex (genitalic {($ (escape string))})
+                             " (" (genurl {($ (render-url url))}) ")")
+                        (tex (genurl {($ (render-url string))})))))))
 
 (defun render-text (text)
   "Render TEXT in TeX representation."

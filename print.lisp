@@ -56,16 +56,20 @@ hack!")
 (defun markup-string (markup)
   "Return string for MARKUP."
   (flet ((escape-and-decorate
-             (delimiter &optional (delimiter2 delimiter))
+             (string delimiter &optional (delimiter2 delimiter))
            (format nil "~a~a~a"
                    delimiter
-                   (escape (content-values markup))
+                   (escape string)
                    delimiter2)))
     (ecase (content-type markup)
-      (:bold        (escape-and-decorate #\*))
-      (:italic      (escape-and-decorate #\_))
-      (:fixed-width (escape-and-decorate #\{ #\}))
-      (:url         (escape-and-decorate #\[ #\])))))
+      (:bold        (escape-and-decorate #1=(content-values markup) #\*))
+      (:italic      (escape-and-decorate #1# #\_))
+      (:fixed-width (escape-and-decorate #1# #\{ #\}))
+      (:url         (multiple-value-bind (string url) #1#
+                      (format nil "~a~@[~a~]"
+                              (escape-and-decorate string #\[ #\])
+                              (when url
+                                (escape-and-decorate url #\( #\)))))))))
 
 (defun text-string (text)
   "Return string for TEXT."
@@ -76,7 +80,10 @@ hack!")
                        (escape #1=(content-values text-token)))
                       ((:bold :italic :fixed-width :url)
                        (if *discard-text-markup-p*
-                           (escape #1#)
+                           (multiple-value-bind (string url) #1#
+                             (format nil "~a~@[ (~a)~]"
+                                     (escape string)
+                                     (and url (escape url))))
                            (markup-string text-token))))))))
 
 (defun listing-string (items &optional (bullet "+ "))

@@ -11,7 +11,7 @@ to load and/or compile Open Geneva as a whole, then you may use the
 {open-geneva} system. The various subsystems are described in the
 sections below.
 
-+ 1. _Open Geneva API_ [open-geneva-api.html]
++ 1. [Open Geneva API](open-geneva-api.html)
 
 
 < Geneva: The Document API
@@ -107,7 +107,7 @@ sections below.
        #i"Bring your friends!"))))
  #
 
- + 1. _Geneva Document Specification_ [geneva-document.html]
+ + 1. [Geneva Document Specification](geneva-document.html)
  + 2. See _Named-Readtables_ ({editor-hints.named-readtables})
 
 >
@@ -131,7 +131,7 @@ sections below.
    → T
  #
 
- + 1. _The Mk2 Markup Language_ [mk2.html]
+ + 1. [The Mk2 Markup Language](mk2.html)
 
 >
 

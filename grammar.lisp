@@ -19,11 +19,25 @@
   (=unless (=escaped-char)
            (=character char)))
 
+(defun =double-newline ()
+  (=and (=newline*)
+        (=newline*)))
+
 (defun =markup% (constructor start &optional (end start))
   (=let* ((_ (=token start))
-          (text (=or (=plain-text (=token end)) (=result "")))
+          (text (=or (=plain-text (=or (=token end) (=double-newline)))
+                     (=result "")))
           (_ (=token end)))
     (=result (funcall constructor text))))
+
+(defun =url-text ()
+  (=let* ((x (=markup% #'identity
+                       *url-directive-start*
+                       *url-directive-end*))
+          (y (=maybe (=markup% #'identity
+                               #\(
+                               #\)))))
+    (=result (make-url x y))))
 
 (defun =markup ()
   (=or (=markup% #'make-bold
@@ -33,9 +47,7 @@
        (=markup% #'make-fixed-width
                  *fixed-width-directive-start*
                  *fixed-width-directive-end*)
-       (=markup% #'make-url
-                 *url-directive-start*
-                 *url-directive-end*)))
+       (=url-text)))
 
 (defun =markup-directive ()
   (=one-of *markup-directives*))
@@ -44,15 +56,14 @@
   (=zero-or-more
    (=or (=markup)
         (=plain-text (=or (=markup-directive)
-                          until)))))
+                          until))
+        ;; Ignore unrecognizable markup.
+        (=let* ((markup-directive (=markup-directive)))
+          (=result (format nil "~a" markup-directive))))))
 
 (defun =newline* ()
   (=and (=zero-or-more (=unless (=newline) (=whitespace)))
         (=newline)))
-
-(defun =double-newline ()
-  (=and (=newline*)
-        (=newline*)))
 
 (defun =end-of-document ()
   (=skip-whitespace (=end-of-input)))

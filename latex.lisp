@@ -19,7 +19,7 @@
   (deftex genbold       (text) (textbf {($ text)}))
   (deftex genitalic     (text) (textit {($ text)}))
   (deftex genfixedwidth (text) (texttt {($ text)}))
-  (deftex genurl        (text) (url    {($ text)}))
+  (deftex genurl        (text) (texttt {($ text)}))
 
   (deftex gentinyparagraph (text)
     (medskip)
@@ -77,11 +77,9 @@
   "Text figure implementation for LaTeX."
   (deftex genverbatimstart ()
     (begin {figure} ["H"])
-    (begin {quote})
     (begin {alltt}))
   (deftex genverbatimend ()
     "\\end{alltt}"
-    (end {quote})
     (vspace {-1em}))
   (deftex genverbatimdescription (description)
     (caption {($ description)})

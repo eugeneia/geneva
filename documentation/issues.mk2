@@ -1,6 +1,5 @@
 < Feature Want-list
 
- + *Labeled URIs* {[label](uri)} (for interactive purposes)
  + *Stop token* {#<newline>} (like an HTML {<br>}, for poetry.)
 
 >

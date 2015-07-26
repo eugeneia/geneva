@@ -2,11 +2,11 @@
 
 (in-package :geneva)
 
-(defun make-markup (type string)
-  "Make markup of TYPE for STRING. Signal a TYPE-ERROR if STRING is not
-of type string."
-  (check-type string string)
-  (list type string))
+(defun make-markup (type &rest strings)
+  "Make markup of TYPE for STRINGS. Signal a TYPE-ERROR if STRINGS are
+not of type string."
+  (loop for string in strings do (check-type string string))
+  `(,type ,@strings))
 
 (defun make-bold (string)
   "*Arguments and Values:*
@@ -39,15 +39,21 @@ of type string."
    _string_."
   (make-markup :fixed-width string))
 
-(defun make-url (string)
+(defun make-url (string &optional url)
   "*Arguments and Values:*
 
    _string_—a _string_.
 
+   _url_—a _string_.
+
    *Description*:
 
-   {make-url} returns a _text token_ of type {:url} for _string_."
-  (make-markup :url string))
+   {make-url} returns a _text token_ of type {:url} for _string_. If
+   _url_ is given then _string_ is used as the label, otherwise _string_
+   is both label and URL."
+  (if url
+      (make-markup :url string url)
+      (make-markup :url string)))
 
 (defun assert-text-token (thing)
   "Assert that THING is a valid text token. On failure signal a

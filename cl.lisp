@@ -26,11 +26,15 @@
                 string-or-symbol
                 (string-downcase string-or-symbol)))))
 
-(defun definition-template (kind-string name &optional text)
+(defun definition-template (&key kind name syntax document)
   "Template for common definition formatting."
-  (document
-   (make-paragraph
-    `("— " ,kind-string ": " ,(make-bold name) " " ,@text))))
+  (make-section
+   `(,name " (" ,kind ")")
+   `(,@(when syntax
+         `(,(paragraph #b"Syntax:")
+           ,(make-paragraph
+             `("— " ,kind ": " ,(make-bold name) " " ,@syntax))))
+     ,@document)))
 
 
 (defun docstring-paragraphs (docstring)
@@ -67,18 +71,19 @@
   "Render VARIABLE-DEFINITION with NAME."
   (destructuring-bind (&key kind documentation value)
       variable-definition
-    (append (definition-template
-              (ecase kind
-                (:variable "Variable")
-                (:constant "Constant"))
-                name)
-            (document
-             (paragraph #b"Initial Value:")
-             (let ((value-string (value-string value)))
-               (if (find #\Newline value-string)
-                   (plaintext nil value-string)
-                   (paragraph (make-fixed-width value-string)))))
-            (docstring-document documentation))))
+    (definition-template
+      :kind (ecase kind
+              (:variable "Variable")
+              (:constant "Constant Variable"))
+      :name name
+      :document (append
+                 (document
+                  (paragraph #b"Initial Value:")
+                  (let ((value-string (value-string value)))
+                    (if (find #\Newline value-string)
+                        (plaintext nil value-string)
+                        (paragraph (make-fixed-width value-string)))))
+                 (docstring-document documentation)))))
 
 (defun render-lambda-list (lambda-list)
   "Render LAMBDA-LIST."
@@ -100,14 +105,14 @@
   "Render FUNCTION-DEFINITION with NAME."
   (destructuring-bind (&key kind documentation lambda-list)
       function-definition
-    (append (definition-template
-              (ecase kind
-                (:function         "Function")
-                (:generic-function "Generic function")
-                (:macro            "Macro"))
-              name
-              (render-lambda-list lambda-list))
-            (docstring-document documentation))))
+    (definition-template
+      :kind (ecase kind
+              (:function         "Function")
+              (:generic-function "Generic Function")
+              (:macro            "Macro"))
+      :name name
+      :syntax (render-lambda-list lambda-list)
+      :document (docstring-document documentation))))
 
 (defun render-class-precedence-list (precedence-list)
   "Render class PRECEDENCE-LIST."
@@ -126,24 +131,31 @@
   (destructuring-bind (&key kind documentation precedence-list initargs)
       class-definition
     (declare (ignore kind))
-    (append
-     (if (member 'condition precedence-list)
-         (definition-template "Condition Type" name)
-         (definition-template "Class" name (render-initargs initargs)))
-     (document (paragraph #b"Class Precedence List:")
-               (render-class-precedence-list precedence-list))
-     (docstring-document documentation))))
+    (let ((document
+           (append
+            (document (paragraph #b"Class Precedence List:")
+                      (render-class-precedence-list precedence-list))
+            (docstring-document documentation))))
+      (if (member 'condition precedence-list)
+          (definition-template
+            :kind "Condition Type"
+            :name name
+            :document document)
+          (definition-template
+            :kind "Class"
+            :name name
+            :syntax (render-initargs initargs)
+            :document document)))))
 
 (defun render-type (name type-definition)
   "Render TYPE-DEFINITION with NAME."
   (destructuring-bind (&key kind documentation)
       type-definition
-    (append (definition-template
-                (ecase kind
-                  (:structure "Structure")
-                  (:type "Type"))
-                name)
-            (docstring-document documentation))))
+    (declare (ignore kind))
+    (definition-template
+      :kind "Type"
+      :name name
+      :document (docstring-document documentation))))
 
 (defun render-definition (name definition)
   "Render DEFINITION for NAME."
@@ -160,9 +172,9 @@
 (defun render-symbol-definitions (symbol definitions)
   "Render DEFINITIONS for SYMBOL."
   (let ((name (name* symbol)))
-    (make-section (list name)
-                  (loop for definition in definitions append
-                       (render-definition name definition)))))
+    (make-document
+     (loop for definition in definitions collect
+          (render-definition name definition)))))
 
 (defun render-package (package)
   "Compile section for PACKAGE."
@@ -172,8 +184,9 @@
        (package-api package)
      (append (read-mk2 docstring)
              (loop for head = definitions then (cddr head) while head
-                collect (render-symbol-definitions (car head)
-                                                   (cadr head)))))))
+                   for symbol = (car head) for defs = (cadr head)
+                if defs append
+                  (render-symbol-definitions symbol defs))))))
 
 (defun api-document (&rest packages)
   "*Arguments and Values:*
