@@ -51,7 +51,10 @@
   (=zero-or-more
    (=or (=markup)
         (=plain-text (=or (=markup-directive)
-                          until)))))
+                          until))
+        ;; Ignore unrecognizable markup.
+        (=let* ((markup-directive (=markup-directive)))
+          (=result (format nil "~a" markup-directive))))))
 
 (defun =newline* ()
   (=and (=zero-or-more (=unless (=newline) (=whitespace)))
