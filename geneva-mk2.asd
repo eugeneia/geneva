@@ -22,4 +22,4 @@
                (:file "print"
                       :depends-on ("mk2"
                                    "tokens")))
-  :depends-on ("geneva" "mpc" "pretty-string" "split-sequence"))
+  :depends-on ("geneva" "mpc" "split-sequence"))

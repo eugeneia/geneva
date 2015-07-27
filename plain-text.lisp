@@ -5,8 +5,7 @@
    "Render Geneva documents as plain text.")
   (:use :cl
 	:geneva
-        :geneva.utilities
-        :pretty-string)
+        :geneva.utilities)
   (:export :render-plain-text))
 
 (in-package :geneva.plain-text)

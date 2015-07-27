@@ -6,4 +6,4 @@
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
   :components ((:file "plain-text"))
-  :depends-on ("geneva" "geneva-mk2" "pretty-string"))
+  :depends-on ("geneva" "geneva-mk2"))

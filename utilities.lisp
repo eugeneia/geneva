@@ -4,7 +4,8 @@
   (:documentation
    "Shared utility functions used by various components of Geneva.")
   (:use :geneva
-        :cl)
+        :cl
+        :split-sequence)
   (:export :*default-index-caption*
            :*index-p*
            :*index-headers-p*
@@ -13,7 +14,9 @@
            :incf-level
            :level-string
            :text-string
-           :document-index))
+           :document-index
+           :wrap-string
+           :align-string))
 
 (in-package :geneva.utilities)
 
@@ -65,3 +68,39 @@
 (defun document-index (document)
   "Returns section hierarchy on DOCUMENT."
   (document-index-2 document (null-level)))
+
+(defun wrap-string (string &optional (columns 72))
+  "Return copy of STRING with spaces replaced by newlines so that lines
+do not exceed COLUMNS characters when possible. COLUMNS defaults to 72."
+  (with-output-to-string (out)
+    (loop for line in (split-sequence #\Newline string)
+       do
+         (loop for word in (split-sequence #\Space line)
+            for word-length = (length word)
+            with count = 0
+            do (cond ((> (+ count word-length) (1+ columns))
+                      (fresh-line out)
+                      (write-string word out)
+                      (setf count (1+ word-length)))
+                     (t
+                      (unless (= count 0)
+                        ;; No Space at beginning of line
+                        (write-char #\Space out))
+                      (write-string word out)
+                      (incf count (1+ word-length)))))
+         (terpri out))))
+
+(defun align-string (string alignment &optional (columns 72))
+  "Return aligned copy of STRING with respect to COLUMNS. Possible values
+for ALIGNMENT are :RIGHT and :CENTER."
+  (with-output-to-string (*standard-output*)
+    (loop for line
+          in (split-sequence #\Newline (wrap-string string columns))
+       when (not (string-equal "" line))
+       do (format t "~a~a~%"
+                  (make-string
+                   (ecase alignment
+                     (:right (1+ (- columns (length line))))
+                     (:center (ceiling (- columns (length line)) 2)))
+                   :initial-element #\Space)
+                  line))))

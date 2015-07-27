@@ -32,8 +32,8 @@
         :geneva.mk2.tokens
         :mpc
         :mpc.characters
-        :pretty-string
         :split-sequence)
+  (:import-from :geneva.utilities :wrap-string)
   (:export :read-mk2
            :syntax-error
            :open-section
