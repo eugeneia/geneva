@@ -15,7 +15,7 @@ in mind.
  definition:
 
  _String_—A character sequence. The exact grammar depends on the
- surrounding context.
+ surrounding context. See _Escape Rules_.
 
  _LF_—A newline character. The exact representation is platform
  dependent.
@@ -96,9 +96,9 @@ in mind.
 
   The exact grammar of the _String_ axiom is context dependent. A
   _String_ may not contain unescaped _terminating sequences_. A
-  terminating sequence is any token following the _String_ axiom in a
-  rule. In order to escape a terminating sequence its first character
-  must be escaped.
+  terminating sequence is the set of any token following the _String_
+  axiom in a rule and _double-lf_. In order to escape a terminating
+  sequence its first character must be escaped.
 
   For illustration consider the grammar in _Table 7_ which utilizes the
   _String_ axiom. In _rule_ the _String_ axiom is followed by
