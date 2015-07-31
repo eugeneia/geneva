@@ -197,7 +197,7 @@ headlines."
 
     *See Also:*
 
-    + _Common Rendering Interface_ [open-geneva.html#section-3-1]"
+    + [Common Rendering Interface](open-geneva.html#section-3-1)"
   (let ((*standard-output* stream)
 	(*index-headers-p* index-headers-p)
         (*header-level* header-level)
@@ -243,7 +243,7 @@ headlines."
 
     *See Also:*
 
-    + _Common Rendering Interface_ [open-geneva.html#section-3-1]"
+    + [Common Rendering Interface](open-geneva.html#section-3-1)"
   (let ((*standard-output* stream))
     (html-widget-document
      title

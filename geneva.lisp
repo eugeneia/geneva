@@ -29,8 +29,8 @@
 
     *See Also:*
 
-    + _Geneva Document Specification_ [geneva-document.html]
-    + _Open Geneva User Manual_ [open-geneva.html]")
+    + [Geneva Document Specification](geneva-document.html)
+    + [Open Geneva User Manual](open-geneva.html)")
   (:use :cl
         :split-sequence)
   (:export :make-paragraph

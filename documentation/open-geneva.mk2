@@ -88,7 +88,7 @@ sections below.
    → T
  #
 
- The package {geneva.macros} provides macro counterparts of the element
+ The {geneva.macros} package provides macro counterparts of the element
  constructors and a readtable² {geneva.macros:syntax} which can come in
  handy when dynamically creating documents. Below is the "birthday
  invitation" example from above revisited using {geneva.macros}.
@@ -193,8 +193,8 @@ sections below.
 < Geneva-cl: Compiling Geneva Documents from Common Lisp On-Line
   Documentation
 
- The {geneva.common-lisp} provides a function {api-document} which can be
- used to compile Geneva documents from Common Lisp on-line
+ The {geneva.common-lisp} package provides a function {api-document}
+ which can be used to compile Geneva documents from Common Lisp on-line
  documentation. Its usage is quite simple and can be explained by
  example:
 

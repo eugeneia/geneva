@@ -19,5 +19,6 @@
 
    *See Also:*
 
-   + syntax-error"
+   + syntax-error
+    + [The Mk2 markup language](mk2.html)"
   (make-document (run (=document) input)))

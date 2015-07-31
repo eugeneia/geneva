@@ -218,7 +218,7 @@ hack!")
 
    *See Also:*
 
-    + _The Mk2 markup language_ [mk2.html]"
+    + [The Mk2 markup language](mk2.html)"
   (let ((*columns* columns)
         (*standard-output* stream)
         (*indent* 0)

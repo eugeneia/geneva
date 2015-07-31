@@ -134,7 +134,7 @@ GENEVA.MK2."
 
    *See Also:*
 
-    + _Common Rendering Interface_ [open-geneva.html#section-3-1]"
+   + [Common Rendering Interface](open-geneva.html#section-3-1)"
   (let ((level (null-level))
         (*standard-output* stream)
         (*index-headers-p* index-headers-p)
