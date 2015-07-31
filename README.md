@@ -22,9 +22,9 @@ including web, print and plain text media.
 
 ## Documentation
 
- * [Geneva Document Specification](geneva-document.html)
- * [Open Geneva Manual](open-geneva.html)
- * [The Mk2 Markup Language](mk2.html)
+ * [Geneva Document Specification](http://inters.co/geneva/geneva-document.html)
+ * [Open Geneva Manual](http://inters.co/geneva/open-geneva.html)
+ * [The Mk2 Markup Language](http://inters.co/geneva/mk2.html)
 
 ## Dependencies
 
