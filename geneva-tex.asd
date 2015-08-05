@@ -6,4 +6,4 @@
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
   :components ((:file "tex"))
-  :depends-on ("geneva" "texp" "named-readtables"))
+  :depends-on ("geneva" "texp" "file-types" "named-readtables"))
