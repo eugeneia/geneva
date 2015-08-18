@@ -15,24 +15,24 @@ defines the following _element types_:
 < Rich Text
 
  A central component of all element types is _rich text_. Rich text is
- defined as a sequence of _text tokens_, each made up of a set of
- character strings and an attribute to signify its appearance. There are
- five different types of text tokens:
+ defined as a sequence of _text tokens_, each made up of a variable
+ number of character strings and an attribute to signify its
+ appearance. There are five different types of text tokens:
 
  #table *Table 1.* Text token types.#
- | Name _strings..._ | Description
+ | Token             | Description
  | plain _s_         | Render _s_ in regular font.
  | bold _s_          | Recommends to render _s_ in bold font.
  | italic _s_        | Recommends to render _s_ in italic font.
  | fixed-width _s_   | Recommends to render _s_ in fixed-width font.
- | url _s_           | Interpret _s_ as _Uniform Resource Locator_.
- | url _s_, _u_      | Interpret _u_ as _Uniform Resource Locator_ and _s_ as its label.
+ | url _s_           | Interpret _s_ as a _Uniform Resource Locator_.
+ | url _s_, _u_      | Interpret _u_ as a _Uniform Resource Locator_ and _s_ as its label.
 
- The occurrance of _whitespace characters_ in text token strings is
+ The occurrence of _whitespace characters_ in text token strings is
  restricted by the following rules:
 
   + Whitespace character sequences of length two or more are to be
-    reduced to a single _space character_ ({ASCII 0x20} or equivalent).
+    reduced to a single _space character_ (ASCII {0x20} or equivalent).
   + For all token types except the plain type, discard prefixes and
     suffixes of whitespace character sequences.
   + For the first and last text tokens in a rich text sequence, discard
@@ -84,9 +84,10 @@ defines the following _element types_:
 < Formal Definition
 
  The table below defines a Geneva document formally using the modifed BNF
- syntax of ANSI Common Lisp's _Notational Conventions_¹.
+ syntax described in ANSI Common Lisp's _Notational Conventions_¹.
 
  #table *Table 2.* Formal definition of a Geneva document.#
+ | Nonterminal      | Production Rule
  | document         | document-element{*}
  | document-element | pargraph {|} listing {|} table {|} plaintext {|} media {|} section
  | paragraph        | text-token{+}
