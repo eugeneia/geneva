@@ -2,10 +2,10 @@ _Open Geneva_ is an implementation of the _Geneva document preparation
 system_ written in _Common Lisp_. This user manual describes the
 components of Open Geneva from a high level perspective and explains
 their operation by example. For a complete API documentation see the
-_Open Geneva API_¹.
+_Open Geneva API_.¹
 
 Open Geneva is divided into several subsystems, each implementing a
-different functionality of the system. For convenience, a "master system"
+different functionality of the system. For convenience, a “master system”
 is provided, which depends on every subsystem of Open Geneva. If you want
 to load and/or compile Open Geneva as a whole, then you may use the
 {open-geneva} system. The various subsystems are described in the
@@ -20,7 +20,7 @@ sections below.
  programatically create and inspect Geneva documents. These functions are
  in the {geneva} package. These constructors verify the integrity of
  their arguments and their return values are normalized as defined in the
- _Geneva Document Specification_¹.
+ _Geneva Document Specification_.¹
 
  There are three different kinds of constructors: The _document_
  constructor {make-document}, _document element_ constructors
@@ -63,7 +63,7 @@ sections below.
  ;; Return list of element types used in document.
  (defun document-features (document)
    (remove-duplicates
-    (loop for element in <document>
+    (loop for element in document
           for type = (content-type element)
       if (eq type :section)
       then append (multiple-value-bind (title body)
@@ -90,8 +90,8 @@ sections below.
 
  The {geneva.macros} package provides macro counterparts of the element
  constructors and a readtable² {geneva.macros:syntax} which can come in
- handy when dynamically creating documents. Below is the "birthday
- invitation" example from above revisited using {geneva.macros}.
+ handy when dynamically creating documents. Below is the “birthday
+ invitation” example from above revisited using {geneva.macros}.
 
  #code Example: Dynamically creating documents using {geneva.macros}.#
  (in-readtable geneva.macros:syntax)

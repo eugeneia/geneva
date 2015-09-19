@@ -1,4 +1,4 @@
-;;;; Tokens used in MK10 document syntax.
+;;;; Tokens used in MK2 document syntax.
 
 (in-package :geneva.mk2.tokens)
 

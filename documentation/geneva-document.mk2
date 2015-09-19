@@ -31,8 +31,8 @@ defines the following _element types_:
  The occurrence of _whitespace characters_ in text token strings is
  restricted by the following rules:
 
-  + Whitespace character sequences of length two or more are to be
-    reduced to a single _space character_ (ASCII {0x20} or equivalent).
+  + All whitespace character sequences are to be reduced to a single
+    _space character_ (ASCII {0x20} or equivalent).
   + For all token types except the plain type, discard prefixes and
     suffixes of whitespace character sequences.
   + For the first and last text tokens in a rich text sequence, discard
@@ -84,10 +84,10 @@ defines the following _element types_:
 < Formal Definition
 
  The table below defines a Geneva document formally using the modifed BNF
- syntax described in ANSI Common Lisp's _Notational Conventions_¹.
+ syntax described in ANSI Common Lisp's _Notational Conventions_.¹
 
  #table *Table 2.* Formal definition of a Geneva document.#
- | Nonterminal      | Production Rule
+ | Symbol           | Expression
  | document         | document-element{*}
  | document-element | pargraph {|} listing {|} table {|} plaintext {|} media {|} section
  | paragraph        | text-token{+}
@@ -98,7 +98,7 @@ defines the following _element types_:
  | media            | rich-text string
  | section          | rich-text document-element{*}
  | rich-text        | text-token{*}
- | text-token       | _A text token, see "Rich Text"_
+ | text-token       | _A text token, see “Rich Text”_
  | string           | _A character string_
 
  + 1. [ANSI Common Lisp: Notational Conventions](http://users-phys.au.dk/harder/Notational-Conventions.html)

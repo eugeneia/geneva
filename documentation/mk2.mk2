@@ -17,8 +17,8 @@ in mind.
  _String_—A character sequence. The exact grammar depends on the
  surrounding context. See _Escape Rules_.
 
- _LF_—A newline character. The exact representation is platform
- dependent.
+ _LF_—A character sequence denoting a line break. The exact
+ representation is platform dependent.
 
  _EOF_—The end of input.
 
@@ -91,8 +91,8 @@ in mind.
 
  < Escape Rules
 
-  The {"\\"} (backslash) can be used to _escape_ the next character. The
-  grammatical significance of a character following {"\\"} is ignored.
+  The “{\\}” (backslash) can be used to _escape_ the next character. The
+  grammatical significance of a character following “{\\}” is ignored.
 
   The exact grammar of the _String_ axiom is context dependent. A
   _String_ may not contain unescaped _terminating sequences_. A
@@ -102,7 +102,7 @@ in mind.
 
   For illustration consider the grammar in _Table 7_ which utilizes the
   _String_ axiom. In _rule_ the _String_ axiom is followed by
-  _terminator_, thus {"foo"} is a _terminating sequence_ of _String_ in
+  _terminator_, thus “{foo}” is a _terminating sequence_ of _String_ in
   _rule_. Valid and invalid character sequences for _String_ in _rule_
   are shown in _Table 8_.
 
@@ -126,9 +126,9 @@ in mind.
 
  < Document and Section
 
-  The Mk2 file in _Figure 1_ contains a paragraph (_A quick brown
-  fox..._) and a section titled "On Pangrams" which contains another
-  paragraph (_A pangram is..._).
+  The Mk2 file in Figure 1 contains a paragraph (_A quick brown fox..._)
+  and a section titled “On Pangrams” which contains another paragraph (_A
+  pangram is..._).
 
   #code *Figure 1*#
   A quick brown fox jumps over the lazy dog.
@@ -145,7 +145,7 @@ in mind.
 
  < Listing and Text Tokens
 
-  The listing in _Figure 2_ contains six items, each being a single text
+  The listing in Figure 2 contains six items, each being a single text
   token.
 
   #code *Figure 2*#
@@ -161,7 +161,7 @@ in mind.
 
  < Table, Media and Plaintext
 
-  The Mk2 file in _Figure 3_ contains table, media and plaintext object,
+  The Mk2 file in Figure 3 contains table, media and plaintext object,
   each having a description and their respective bodies.
 
   #code *Figure 3*#
@@ -188,26 +188,26 @@ in mind.
   (backslash) character to avoid the semantics of a specific token. Below
   are examples of the most common cases.
 
-  #table *Figure 4.* Escaping unintended text token markup.#
+  #table *Figure 4* Escaping unintended text token markup.#
   | Mk2 | Result
-  | {In ECMAScript anonymous functions can be expressed using the {function (...) { ... \\\}\} special form.} \
-  | In ECMAScript anonymous functions can be expressed using the {function (...) { ... \}} special form.
+  | {In ECMAScript anonymous functions can be expressed using the {function (...) { ... \\\}\} special form.} \
+  | In ECMAScript anonymous functions can be expressed using the {function (...) { ... \}} special form.
 
-  The Mk2 file in _Figure 4_ escapes the first {\}} (curly bracket)
+  The Mk2 file in Figure 4 escapes the first {\}} (curly bracket)
   character inside a fixed width text token in order to avoid terminating
   the fixed width token prematurely. Not that only the closing bracket
   needs to be escaped because it is the only terminating token of the
   _String_ in a fixed width token.
 
 
-  #table *Figure 5.* Including the literal backslash character.#
+  #table *Figure 5* Including the literal backslash character.#
   | Mk2 | Result
   | {On DOS, {\\\\\} (backslash) is used to separate the components of a pathname.} \
   | On DOS, {\\} (backslash) is used to separate the components of a pathname.
 
   Sometimes the user needs to include the literal backslash character in
   his prose. The {\\} (backslash) character can be escaped using itself
-  just like any other character as _Figure 5_ shows.
+  just like any other character as Figure 5 shows.
 
  >
 
