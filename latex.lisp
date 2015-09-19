@@ -120,8 +120,7 @@
        (usepackage {graphicx})
        (usepackage {tabularx})
        (usepackage {alltt})
-       (usepackage {float})
-       (usepackage [hyphens] {url})))
+       (usepackage {float})))
 
 (defun render-latex (document
                      &key (stream *standard-output*)
