@@ -18,10 +18,13 @@
 
 (in-readtable geneva.macros:syntax)
 
+(defun nobreak-hyphens (string)
+  (format nil "~{~a~^‑~}" (split-sequence #\- string)))
+
 (defun name* (string-or-symbol)
   "Canonicalize STRING-OR-SYMBOL to string."
   (etypecase string-or-symbol
-    (symbol (name* (symbol-name string-or-symbol)))
+    (symbol (name* (nobreak-hyphens (symbol-name string-or-symbol))))
     (string (if (find-if #'lower-case-p string-or-symbol)
                 string-or-symbol
                 (string-downcase string-or-symbol)))))
