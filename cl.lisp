@@ -211,8 +211,4 @@
 
    {symbol-document} renders the on-line documentation for _symbol_ as a
    Geneva document."
-  (multiple-value-bind (header definitions)
-      (content-values (render-symbol-definitions
-                       symbol (symbol-definitions symbol)))
-    (declare (ignore header))
-    (make-document definitions)))
+  (render-symbol-definitions symbol (symbol-definitions symbol)))
