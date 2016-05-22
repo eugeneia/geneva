@@ -21,4 +21,4 @@
 
    + syntax-error
     + [The Mk2 markup language](mk2.html)"
-  (make-document (run (=document) input)))
+  (make-document (parse input (=document))))
