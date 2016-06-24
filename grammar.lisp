@@ -2,31 +2,25 @@
 
 (in-package :geneva.mk2)
 
-(defun unescape (str)
-  "Unescape backslash escaped STR."
-  (flet ((next (s) (position #\\ str :start s)))
-    (with-output-to-string (out)
-      (loop with l = (length str)
-         for s = 0 then (1+ p)
-         for p = (next s) then (when (> l s) (next (1+ s)))
-       do (write-string (subseq str s p) out)
-       while p))))
-
 (defun ?escape ()
   (?char *escape-directive*))
 
 (defun ?escaped-char ()
   (?list (?escape) (?not (?end))))
 
-(defun ?plain-char ()
-  (%or (?escaped-char) (?not (?end))))
-
-(defun =plain-text (until)
-  (=transform (=subseq (%some (%diff (?plain-char) until)))
-              'unescape))
-
 (defun ?token (char)
   (%diff (?char char) (?escaped-char)))
+
+(defun =escaped-seq (until)
+  (%or (=destructure (_ seq)
+           (=list (?escape)
+                  (=subseq (?list (?not (?end))
+                                  (%any (%diff (?not (?escape)) until))))))
+       (=subseq (%some (%diff (?not (?escape)) until)))))
+
+(defun =plain-text (until)
+  (=destructure (&rest items) (%some (=escaped-seq until))
+    (apply 'concatenate 'string items)))
 
 (defun ?newline* ()
   (?list (%any (%diff (?whitespace) (?newline)))
@@ -116,9 +110,7 @@
   "We are liberal as to whats a valid URL. That decision is out of scope. We
 even allow multiline strings with escaped newlines."
   (=destructure (url _)
-      (=list (%skip-horizontal-space
-              (=transform (=subseq (%any (?not (?token #\Newline))))
-                          'unescape))
+      (=list (%skip-horizontal-space (=text (?token #\Newline)))
              (%or (?content-delimiter)
                   ;; Object is not terminated properly
                   (?syntax-error 'malformed-element)))))
