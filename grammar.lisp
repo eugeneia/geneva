@@ -71,7 +71,7 @@
   (%any (=text-token until)))
 
 (defun ?end-of-document ()
-  (%skip-whitespace (?end)))
+  (?list (%any (?whitespace)) (?end)))
 
 (defun ?content-delimiter ()
   (%or (?double-newline) (?end-of-document)))
@@ -106,19 +106,15 @@
              parser)
     (funcall constructor description body)))
 
-(defun %skip-horizontal-space (parser)
-  "Skip horizontal whitespace and apply PARSER."
-  (=destructure (_ result)
-      (=list (%any (%diff (?whitespace) (?newline)))
-             parser)))
+(defun ?horizontal-whitespace ()
+  (%diff (?whitespace) (?newline)))
 
 (defun =url ()
   "We are liberal as to whats a valid URL. That decision is out of scope. We
 even allow multiline strings with escaped newlines."
-  (=destructure (url _)
-      (=list (%skip-horizontal-space
-              (=transform (=subseq (%any (?not (?token #\Newline))))
-                          'unescape))
+  (=destructure (_ url _)
+      (=list (%any (?horizontal-whitespace))
+             (=transform (=subseq (%any (?not (?token #\Newline)))) 'unescape)
              (%or (?content-delimiter)
                   ;; Object is not terminated properly
                   (?syntax-error 'malformed-element)))))
@@ -130,8 +126,9 @@ even allow multiline strings with escaped newlines."
                          (?newline*))))))
 
 (defun =table-row ()
-  (=destructure (row _)
-      (=list (%some (%skip-horizontal-space (=table-column)))
+  (=destructure (_ row _)
+      (=list (%any (?horizontal-whitespace))
+             (%some (=table-column))
              (%maybe (?newline*)))))
 
 (defun =table-body ()
@@ -144,7 +141,8 @@ even allow multiline strings with escaped newlines."
                   (?syntax-error 'malformed-element)))))
 
 (defun ?plaintext-terminator ()
-  (?list (%skip-whitespace (?token *object-delimiter*))
+  (?list (%any (?whitespace))
+         (?token *object-delimiter*)
          (?content-delimiter)))
 
 (defun =plaintext-line ()
@@ -169,7 +167,8 @@ even allow multiline strings with escaped newlines."
                             (=text (?content-delimiter))
                             (?content-delimiter)
                             '=contents/p
-                            (%or (%skip-whitespace (?token *section-end*))
+                            (%or (?list (%any (?whitespace))
+                                        (?token *section-end*))
                                  ;; Sections must be closed aye.
                                  (?syntax-error 'section-not-closed)))
                    (make-section header contents))
@@ -177,13 +176,12 @@ even allow multiline strings with escaped newlines."
     (section-not-closed () (?syntax-error 'open-section))))
 
 (defun =contents ()
-  (%any
-   ;; Leading whitespace is insignificant.
-   (%skip-whitespace
-    (%or '=section/p
-         (=object)
-         (=listing)
-         (=paragraph)))))
+  (%any (=destructure (_ element)
+            (=list (%any (?whitespace)) ; Leading whitespace is insignificant.
+                   (%or '=section/p
+                        (=object)
+                        (=listing)
+                        (=paragraph))))))
 
 ;; We make the parsers of =SECTION and =CONTENTS callable by symbol. This is
 ;; necessary because they are mutually recursive.
