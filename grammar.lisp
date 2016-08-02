@@ -16,7 +16,7 @@
   (?char *escape-directive*))
 
 (defun ?escaped-char ()
-  (?list (?escape) (?not (?end))))
+  (?seq (?escape) (?not (?end))))
 
 (defun ?plain-char ()
   (%or (?escaped-char) (?not (?end))))
@@ -29,11 +29,11 @@
   (%diff (?char char) (?escaped-char)))
 
 (defun ?newline* ()
-  (?list (%any (%diff (?whitespace) (?newline)))
-         (?newline)))
+  (?seq (%any (%diff (?whitespace) (?newline)))
+        (?newline)))
 
 (defun ?double-newline ()
-  (?list (?newline*) (?newline*)))
+  (?seq (?newline*) (?newline*)))
 
 (defun =markup1 (constructor start &optional (end start))
   (=destructure (_ text _)
@@ -71,7 +71,7 @@
   (%any (=text-token until)))
 
 (defun ?end-of-document ()
-  (?list (%any (?whitespace)) (?end)))
+  (?seq (%any (?whitespace)) (?end)))
 
 (defun ?content-delimiter ()
   (%or (?double-newline) (?end-of-document)))
@@ -97,10 +97,11 @@
 
 (defun =object1 (keyword constructor parser
                  &aux (delimiter (?token *object-delimiter*)))
-  (=destructure (_ description _ body)
-      (=list (?list delimiter (?string keyword nil))
+  (=destructure (_ _ description _ body)
+      (=list delimiter
+             (?string keyword nil)
              (=text (%or delimiter (?content-delimiter)))
-             (%or (?list delimiter (?newline*))
+             (%or (?seq delimiter (?newline*))
                   ;; Description is not terminated properly
                   (?syntax-error 'malformed-element))
              parser)
@@ -141,9 +142,9 @@ even allow multiline strings with escaped newlines."
                   (?syntax-error 'malformed-element)))))
 
 (defun ?plaintext-terminator ()
-  (?list (%any (?whitespace))
-         (?token *object-delimiter*)
-         (?content-delimiter)))
+  (?seq (%any (?whitespace))
+        (?token *object-delimiter*)
+        (?content-delimiter)))
 
 (defun =plaintext-line ()
   (%diff (=line) (%or (?plaintext-terminator) (?end-of-document))))
@@ -167,8 +168,8 @@ even allow multiline strings with escaped newlines."
                             (=text (?content-delimiter))
                             (?content-delimiter)
                             '=contents/p
-                            (%or (?list (%any (?whitespace))
-                                        (?token *section-end*))
+                            (%or (?seq (%any (?whitespace))
+                                       (?token *section-end*))
                                  ;; Sections must be closed aye.
                                  (?syntax-error 'section-not-closed)))
                    (make-section header contents))
