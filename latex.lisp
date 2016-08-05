@@ -97,11 +97,14 @@
           (subsubsection {($ header)})))
       (progn
         (deftex gensection (header)
-          (section* {($ header)}))
+          (section* {($ header)})
+          (addcontentsline {toc} {section} {($ header)}))
         (deftex gensubsection (header)
-          (subsection* {($ header)}))
+          (subsection* {($ header)})
+          (addcontentsline {toc} {subsection} {($ header)}))
         (deftex gensubsubsection (header)
-          (subsubsection* {($ header)})))))
+          (subsubsection* {($ header)})
+          (addcontentsline {toc} {subsubsection} {($ header)})))))
 
 (defun document-implementation ()
   "Implementation of the document primitives for LaTeX."
