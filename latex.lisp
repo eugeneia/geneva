@@ -64,7 +64,7 @@
   "Graphic figure implementation for LaTeX."
   (deftex gengraphic (description url)
     (genfigure {($ description)}
-               {(includegraphics [width=0.8 (columnwidth)]
+               {(includegraphics [width=(columnwidth)]
                                  {($ url)})})))
 
 (defun latex-fallback-figure ()
