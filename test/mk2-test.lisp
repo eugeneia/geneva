@@ -2,7 +2,6 @@
 
 (defpackage geneva.mk2-test
   (:use :cl
-        :mpc
         :geneva
         :geneva.mk2
         :geneva.mk2.tokens)

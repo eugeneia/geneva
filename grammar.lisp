@@ -1,4 +1,4 @@
-;;;; MPC grammar used by GENEVA.MK2.
+;;;; MaxPC grammar used by GENEVA.MK2.
 
 (in-package :geneva.mk2)
 

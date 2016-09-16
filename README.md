@@ -28,7 +28,7 @@ including web, print and plain text media.
 
 ## Dependencies
 
- * [mpc](https://github.com/eugeneia/mpc)
+ * [maxpc](https://github.com/eugeneia/maxpc)
  * [file-types](https://github.com/eugeneia/file-types)
  * [macro-html](https://github.com/eugeneia/macro-html)
  * [trivial-documentation](https://github.com/eugeneia/trivial-documentation)
