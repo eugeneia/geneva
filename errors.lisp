@@ -114,9 +114,9 @@
 
 ;;; Error signaling routine.
 
-(defun =syntax-error (error)
+(defun ?syntax-error (error)
   "Signal ERROR at current position."
-  (=fail (multiple-value-bind (position line character)
+  (?fail (multiple-value-bind (position line character)
              (get-input-position)
            (declare (ignore position))
            (error error :line line :character character))))

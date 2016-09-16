@@ -2,182 +2,197 @@
 
 (in-package :geneva.mk2)
 
-(defun =escape ()
-  (=character *escape-directive*))
+(defun unescape (str)
+  "Unescape backslash escaped STR."
+  (flet ((next (s) (position #\\ str :start s)))
+    (with-output-to-string (out)
+      (loop with l = (length str)
+         for s = 0 then (1+ p)
+         for p = (next s) then (when (> l s) (next (1+ s)))
+       do (write-string (subseq str s p) out)
+       while p))))
 
-(defun =escaped-char ()
-  (=and (=escape) (=item)))
+(defun ?escape ()
+  (?char *escape-directive*))
 
-(defun =plain-char ()
-  (=or (=escaped-char)
-       (=item)))
+(defun ?escaped-char ()
+  (?seq (?escape) (?not (?end))))
+
+(defun ?plain-char ()
+  (%or (?escaped-char) (?not (?end))))
 
 (defun =plain-text (until)
-  (=string-of (=unless until (=plain-char))))
+  (=transform (=subseq (%some (%diff (?plain-char) until)))
+              'unescape))
 
-(defun =token (char)
-  (=unless (=escaped-char)
-           (=character char)))
+(defun ?token (char)
+  (%diff (?char char) (?escaped-char)))
 
-(defun =double-newline ()
-  (=and (=newline*)
-        (=newline*)))
+(defun ?newline* ()
+  (?seq (%any (%diff (?whitespace) (?newline)))
+        (?newline)))
 
-(defun =markup% (constructor start &optional (end start))
-  (=let* ((_ (=token start))
-          (text (=or (=plain-text (=or (=token end) (=double-newline)))
-                     (=result "")))
-          (_ (=token end)))
-    (=result (funcall constructor text))))
+(defun ?double-newline ()
+  (?seq (?newline*) (?newline*)))
+
+(defun =markup1 (constructor start &optional (end start))
+  (=destructure (_ text _)
+      (=list (?token start)
+             (=plain-text (%or (?token end) (?double-newline)))
+             (?token end))
+    (funcall constructor text)))
 
 (defun =url-text ()
-  (=let* ((x (=markup% #'identity
-                       *url-directive-start*
-                       *url-directive-end*))
-          (y (=maybe (=markup% #'identity
-                               #\(
-                               #\)))))
-    (=result (make-url x y))))
+  (=destructure (x y)
+      (=list (=markup1 #'identity *url-directive-start* *url-directive-end*)
+             (%maybe (=markup1 #'identity #\( #\))))
+    (make-url x y)))
 
 (defun =markup ()
-  (=or (=markup% #'make-bold
+  (%or (=markup1 #'make-bold
                  *bold-directive*)
-       (=markup% #'make-italic
+       (=markup1 #'make-italic
                  *italic-directive*)
-       (=markup% #'make-fixed-width
+       (=markup1 #'make-fixed-width
                  *fixed-width-directive-start*
                  *fixed-width-directive-end*)
        (=url-text)))
 
-(defun =markup-directive ()
-  (=one-of *markup-directives*))
+(defun ?markup-directive ()
+  (?test ('member *markup-directives*)))
+
+(defun =text-token (until)
+  (%or (=markup)
+       (=plain-text (%or (?markup-directive) until))
+       ;; Ignore incomplete markup.
+       (=subseq (?markup-directive))))
 
 (defun =text (until)
-  (=zero-or-more
-   (=or (=markup)
-        (=plain-text (=or (=markup-directive)
-                          until))
-        ;; Ignore unrecognizable markup.
-        (=let* ((markup-directive (=markup-directive)))
-          (=result (format nil "~a" markup-directive))))))
+  (%any (=text-token until)))
 
-(defun =newline* ()
-  (=and (=zero-or-more (=unless (=newline) (=whitespace)))
-        (=newline)))
+(defun ?end-of-document ()
+  (?seq (%any (?whitespace)) (?end)))
 
-(defun =end-of-document ()
-  (=skip-whitespace (=end-of-input)))
-
-(defun =content-delimiter ()
-  (=or (=double-newline)
-       (=end-of-document)))
+(defun ?content-delimiter ()
+  (%or (?double-newline) (?end-of-document)))
 
 (defun =paragraph ()
-  (=let* ((text (=text (=or (=content-delimiter)
-                            (=token *section-end*))))
-          (_ (=content-delimiter)))
-    (if text
-        (=result (make-paragraph text))
-        (=fail))))
+  (=destructure (text _)
+      (=list (%some (=text-token (%or (?content-delimiter)
+                                      (?token *section-end*))))
+             (?content-delimiter))
+    (make-paragraph text)))
 
 (defun =list-item ()
-  (=prog2 (=token *listing-item*)
-          (=text (=or (=token *listing-item*)
-                      (=content-delimiter)))))
+  (=destructure (_ text)
+      (=list (?token *listing-item*)
+             (=text (%or (?token *listing-item*)
+                         (?content-delimiter))))))
 
 (defun =listing ()
-  (=let* ((items (=one-or-more (=list-item)))
-          (_ (=content-delimiter)))
-    (=result (make-listing items))))
+  (=destructure (items _)
+      (=list (%some (=list-item))
+             (?content-delimiter))
+    (make-listing items)))
 
-(defun =object% (keyword constructor parser)
-  (let ((delimiter (=token *object-delimiter*)))
-    ;; DELIMITER KEYWORD TEXT DELIMITER PARSER.
-    (=let* ((_ (=and delimiter (=string keyword nil)))
-            (description (=text (=or delimiter (=content-delimiter))))
-            (_ (=or (=and delimiter (=newline*))
-                    ;; Description is not terminated properly
-                    (=syntax-error 'malformed-element)))
-            (body parser))
-      (=result (funcall constructor description body)))))
+(defun =object1 (keyword constructor parser
+                 &aux (delimiter (?token *object-delimiter*)))
+  (=destructure (_ _ description _ body)
+      (=list delimiter
+             (?string keyword nil)
+             (=text (%or delimiter (?content-delimiter)))
+             (%or (?seq delimiter (?newline*))
+                  ;; Description is not terminated properly
+                  (?syntax-error 'malformed-element))
+             parser)
+    (funcall constructor description body)))
 
-(defun =skip-horizontal-space (parser)
-  "Skip horizontal whitespace and apply PARSER."
-  (=and (=zero-or-more (=unless (=newline) (=whitespace)))
-        parser))
+(defun ?horizontal-whitespace ()
+  (%diff (?whitespace) (?newline)))
 
 (defun =url ()
-  "We are liberal as to whats a valid URL. That decision is out of scope.
-We even allow multiline strings with escaped newlines."
-  (=prog1 (=skip-horizontal-space (=string-of (=not (=token #\Newline))))
-          (=or (=content-delimiter)
-               ;; Object is not terminated properly
-               (=syntax-error 'malformed-element))))
+  "We are liberal as to whats a valid URL. That decision is out of scope. We
+even allow multiline strings with escaped newlines."
+  (=destructure (_ url _)
+      (=list (%any (?horizontal-whitespace))
+             (=transform (=subseq (%any (?not (?token #\Newline)))) 'unescape)
+             (%or (?content-delimiter)
+                  ;; Object is not terminated properly
+                  (?syntax-error 'malformed-element)))))
 
 (defun =table-column ()
-  (=and (=token *table-item*)
-        (=text (=or (=token *table-item*)
-                    (=newline*)))))
+  (=destructure (_ text)
+      (=list (?token *table-item*)
+             (=text (%or (?token *table-item*)
+                         (?newline*))))))
 
 (defun =table-row ()
-  (=one-or-more
-   (=skip-horizontal-space (=table-column))))
+  (=destructure (_ row _)
+      (=list (%any (?horizontal-whitespace))
+             (%some (=table-column))
+             (%maybe (?newline*)))))
 
 (defun =table-body ()
-  (=prog1 (=one-or-more (=prog1 (=table-row)
-                                (=maybe (=newline*))))
-          (=or (=content-delimiter)
-               ;; Single newline is ok in case last row ate one.
-               (=newline*)
-               ;; Object is not terminated properly
-               (=syntax-error 'malformed-element))))
+  (=destructure (rows _)
+      (=list (%some (=table-row))
+             (%or (?content-delimiter)
+                  ;; Single newline is ok in case last row ate one.
+                  (?newline*)
+                  ;; Object is not terminated properly
+                  (?syntax-error 'malformed-element)))))
 
-(defun =plaintext-terminator ()
-  (=and (=skip-whitespace (=token *object-delimiter*))
-        (=content-delimiter)))
+(defun ?plaintext-terminator ()
+  (?seq (%any (?whitespace))
+        (?token *object-delimiter*)
+        (?content-delimiter)))
 
 (defun =plaintext-line ()
-  (=unless (=or (=plaintext-terminator)
-                (=end-of-document))
-           (=line)))
+  (%diff (=line) (%or (?plaintext-terminator) (?end-of-document))))
 
 (defun =plaintext-body ()
-  (=let* ((lines (=zero-or-more (=plaintext-line)))
-          (_ (=or (=plaintext-terminator)
-                  (=syntax-error 'malformed-element))))
-    (=result (format nil "~{~a~^~%~}" lines))))
+  (=destructure (lines _)
+      (=list (%any (=plaintext-line))
+             (%or (?plaintext-terminator)
+                  (?syntax-error 'malformed-element)))
+    (format nil "~{~a~^~%~}" lines)))
 
 (defun =object ()
-  (=or
-   (=object% *media-keyword*     #'make-media     (=url))
-   (=object% *table-keyword*     #'make-table     (=table-body))
-   (=object% *plaintext-keyword* #'make-plaintext (=plaintext-body))))
+  (%or
+   (=object1 *media-keyword*     #'make-media     (=url))
+   (=object1 *table-keyword*     #'make-table     (=table-body))
+   (=object1 *plaintext-keyword* #'make-plaintext (=plaintext-body))))
 
 (defun =section ()
-  (=handler-case
-   (=let* ((_ (=token *section-start*))
-           (header (=text (=content-delimiter)))
-           (_ (=content-delimiter))
-           (contents (=contents))
-           (_ (=or (=skip-whitespace (=token *section-end*))
-                   ;; Sections must be closed aye.
-                   (=syntax-error 'section-not-closed))))
-     (=result (make-section header contents)))
-   ;; We have an unclosed section so we signal where it opened.
-   (section-not-closed () (=syntax-error 'open-section))))
+  (%handler-case (=destructure (_ header _ contents _)
+                     (=list (?token *section-start*)
+                            (=text (?content-delimiter))
+                            (?content-delimiter)
+                            '=contents/p
+                            (%or (?seq (%any (?whitespace))
+                                       (?token *section-end*))
+                                 ;; Sections must be closed aye.
+                                 (?syntax-error 'section-not-closed)))
+                   (make-section header contents))
+    ;; We have an unclosed section so we signal where it opened.
+    (section-not-closed () (?syntax-error 'open-section))))
 
 (defun =contents ()
-  (=zero-or-more
-   ;; Leading whitespace is insignificant.
-   (=skip-whitespace
-    (=or (=section)
-         (=object)
-         (=listing)
-         (=paragraph)))))
+  (%any (=destructure (_ element)
+            (=list (%any (?whitespace)) ; Leading whitespace is insignificant.
+                   (%or '=section/p
+                        (=object)
+                        (=listing)
+                        (=paragraph))))))
+
+;; We make the parsers of =SECTION and =CONTENTS callable by symbol. This is
+;; necessary because they are mutually recursive.
+(setf (fdefinition '=section/p) (=section)
+      (fdefinition '=contents/p) (=contents))
 
 (defun =document ()
-  (=prog1
-   (=contents)
-   (=or (=end-of-document)
-        ;; Unless all input was successfully parsed something went wrong.
-        (=syntax-error 'unrecognized-input))))
+  (=destructure (contents _)
+      (=list
+       '=contents/p
+       (%or (?end-of-document)
+            ;; Unless all input was successfully parsed something went wrong.
+            (?syntax-error 'unrecognized-input)))))

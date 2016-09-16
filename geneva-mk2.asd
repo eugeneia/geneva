@@ -22,4 +22,4 @@
                (:file "print"
                       :depends-on ("mk2"
                                    "tokens")))
-  :depends-on ("geneva" "mpc" "split-sequence"))
+  :depends-on ("geneva" "maxpc" "split-sequence"))
