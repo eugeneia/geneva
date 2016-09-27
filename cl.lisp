@@ -97,11 +97,9 @@
          if (listp x)
          append `(,#f"(" ,@(render-lambda-list x) ,#f")")
          else collect
-           (case x
-             ((&key &allow-other-keys &aux &body
-               &environment &optional &rest &whole)
-              (make-fixed-width (string-downcase (name* x))))
-             (otherwise (make-italic (name* x))))
+           (if (member x lambda-list-keywords)
+               (make-fixed-width (string-downcase (name* x)))
+               (make-italic (name* x)))
          when (cdr head) collect " ")))
 
 (defun render-function (name function-definition)
@@ -181,15 +179,16 @@
 
 (defun render-package (package)
   "Compile section for PACKAGE."
-  (make-section
-   (list (name* (package-name package)))
-   (multiple-value-bind (docstring definitions)
-       (package-api package)
-     (append (read-mk2 docstring)
-             (loop for head = definitions then (cddr head) while head
-                   for symbol = (car head) for defs = (cadr head)
-                if defs append
-                  (render-symbol-definitions symbol defs))))))
+  (definition-template
+    :name (name* (package-name package))
+    :kind "Package"
+    :document
+    (multiple-value-bind (docstring definitions)
+        (package-api package)
+      (append (read-mk2 docstring)
+              (loop for head = definitions then (cddr head) while head
+                    for symbol = (car head) for defs = (cadr head)
+                 if defs append (render-symbol-definitions symbol defs))))))
 
 (defun api-document (&rest packages)
   "*Arguments and Values:*
