@@ -21,10 +21,13 @@
 (defun nobreak-hyphens (string)
   (format nil "~{~a~^‑~}" (split-sequence #\- string)))
 
-(defun name* (string-or-symbol)
+(defun name* (string-or-symbol &key nobreak-p)
   "Canonicalize STRING-OR-SYMBOL to string."
   (etypecase string-or-symbol
-    (symbol (name* (nobreak-hyphens (symbol-name string-or-symbol))))
+    (symbol (name* (let ((name (symbol-name string-or-symbol)))
+                     (if nobreak-p
+                         (nobreak-hyphens name)
+                         name))))
     (string (if (find-if #'lower-case-p string-or-symbol)
                 string-or-symbol
                 (string-downcase string-or-symbol)))))
@@ -93,13 +96,15 @@
   (if (null lambda-list)
       (list #i"<no arguments>")
       (loop for head = lambda-list then (cdr head) while head
-         for x = (car head)
+            for x = (car head)
+            with keyword-p = nil
+         when (eq '&key x) do (setf keyword-p t)
          if (listp x)
          append `(,#f"(" ,@(render-lambda-list x) ,#f")")
          else collect
            (if (member x lambda-list-keywords)
-               (make-fixed-width (string-downcase (name* x)))
-               (make-italic (name* x)))
+               (make-fixed-width (name* x :nobreak-p t))
+               (make-italic (name* x :nobreak-p (not keyword-p))))
          when (cdr head) collect " ")))
 
 (defun render-function (name function-definition)
