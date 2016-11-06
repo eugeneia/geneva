@@ -132,16 +132,25 @@
   (when initargs
     (render-lambda-list (list* '&key initargs))))
 
+(defun render-slots (slots)
+  (loop for head = slots then (cddr head) while head
+        for (slot docstring . ()) = head
+     collect (paragraph (make-fixed-width (name* slot)))
+     append (docstring-document docstring)))
+
 (defun render-class (name class-definition)
   "Render CLASS-DEFINITION with NAME."
-  (destructuring-bind (&key kind documentation precedence-list initargs)
+  (destructuring-bind (&key kind documentation precedence-list initargs slots)
       class-definition
     (declare (ignore kind))
     (let ((document
            (append
             (document (paragraph #b"Class Precedence List:")
                       (render-class-precedence-list precedence-list))
-            (docstring-document documentation))))
+            (docstring-document documentation)
+            (when slots
+              (append (document (paragraph #b"Slots:"))
+                      (make-document (render-slots slots)))))))
       (if (member 'condition precedence-list)
           (definition-template
             :kind "Condition Type"
